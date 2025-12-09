@@ -12,6 +12,7 @@ import cors from "cors";
 import { config } from "./config/env.js";
 import connectDB from "./config/db.js";
 import authRouter from "./routes/auth.route.js";
+import profileRouter from "./routes/profile.route.js";
 import { requestLogger } from "./utils/logger.js";
 
 const app = express();
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/profile", profileRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
