@@ -1,30 +1,33 @@
-import React from 'react'
-import { Button } from '../ui/button'
+import React from "react";
+import { Button } from "../ui/button";
 
 const Testimonials = () => {
   const testimonials = [
     {
-      icon: '👩‍🎓',
-      name: 'Riya',
-      role: 'Web Developer',
-      feedback: '"The Full Stack program helped me switch careers and land my first tech job."',
-      gradient: 'from-cyan-100 to-blue-100'
+      icon: "👩‍🎓",
+      name: "Riya",
+      role: "Web Developer",
+      feedback:
+        '"The Full Stack program helped me switch careers and land my first tech job."',
+      gradient: "from-cyan-100 to-blue-100",
     },
     {
-      icon: '👨‍🔧',
-      name: 'Aman',
-      role: 'Electrician Trainee',
-      feedback: '"Hands-on PMKVY training prepared me for real-world work instantly."',
-      gradient: 'from-yellow-100 to-orange-100'
+      icon: "👨‍🔧",
+      name: "Aman",
+      role: "Electrician Trainee",
+      feedback:
+        '"Hands-on PMKVY training prepared me for real-world work instantly."',
+      gradient: "from-yellow-100 to-orange-100",
     },
     {
-      icon: '👩‍⚕️',
-      name: 'Sana',
-      role: 'Healthcare Assistant',
-      feedback: '"The certification and placement support changed my confidence completely."',
-      gradient: 'from-green-100 to-teal-100'
-    }
-  ]
+      icon: "👩‍⚕️",
+      name: "Sana",
+      role: "Healthcare Assistant",
+      feedback:
+        '"The certification and placement support changed my confidence completely."',
+      gradient: "from-green-100 to-teal-100",
+    },
+  ];
 
   return (
     <div className="relative px-12 py-20 bg-gradient-to-br from-gray-50 to-gray-100">
@@ -38,7 +41,8 @@ const Testimonials = () => {
             </h2>
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Real stories from learners who transformed their careers with Skill India
+            Real stories from learners who transformed their careers with Skill
+            India
           </p>
         </div>
 
@@ -71,9 +75,7 @@ const Testimonials = () => {
                 <h4 className="font-semibold text-gray-900 text-lg">
                   {item.name}
                 </h4>
-                <p className="text-sm text-gray-600">
-                  {item.role}
-                </p>
+                <p className="text-sm text-gray-600">{item.role}</p>
               </div>
 
               {/* Star Rating */}
@@ -100,14 +102,14 @@ const Testimonials = () => {
           <p className="text-gray-600 mb-6 max-w-xl mx-auto">
             Hear directly from our learners about their journey to success
           </p>
-          
+
           {/* Video Placeholder */}
           <div className="max-w-3xl mx-auto mb-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl aspect-video flex items-center justify-center shadow-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-cyan-500/20"></div>
             <button className="relative z-10 w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
-              <svg 
-                className="w-10 h-10 text-gray-900 ml-1" 
-                fill="currentColor" 
+              <svg
+                className="w-10 h-10 text-gray-900 ml-1"
+                fill="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path d="M8 5v14l11-7z" />
@@ -115,30 +117,30 @@ const Testimonials = () => {
             </button>
           </div>
 
-          <Button 
+          <Button
             variant="default"
             size="lg"
             className="bg-gradient-to-r from-orange-500 to-cyan-500 hover:from-orange-600 hover:to-cyan-600 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Read More Success Stories
-            <svg 
-              className="w-5 h-5 ml-2" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-5 h-5 ml-2"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M17 8l4 4m0 0l-4 4m4-4H3" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
               />
             </svg>
           </Button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Testimonials
+export default Testimonials;

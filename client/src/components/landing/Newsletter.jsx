@@ -1,14 +1,14 @@
-import React, { useState } from 'react'
-import { Button } from '../ui/button'
+import React, { useState } from "react";
+import { Button } from "../ui/button";
 
 const Newsletter = () => {
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState("");
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     // Handle newsletter subscription
-    console.log('Subscribing email:', email)
-  }
+    console.log("Subscribing email:", email);
+  };
 
   return (
     <div className="relative px-12 pt-20 bg-gradient-to-br from-gray-50 to-gray-100">
@@ -25,28 +25,65 @@ const Newsletter = () => {
                 </h2>
               </div>
               <p className="text-lg text-gray-600 mb-6">
-                Get alerts on upcoming courses, job fairs, and skill initiatives. Never miss an opportunity to upskill!
+                Get alerts on upcoming courses, job fairs, and skill
+                initiatives. Never miss an opportunity to upskill!
               </p>
-              
+
               {/* Benefits List */}
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
-                  <span className="text-gray-700">Weekly course updates and new program launches</span>
+                  <span className="text-gray-700">
+                    Weekly course updates and new program launches
+                  </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
-                  <span className="text-gray-700">Exclusive job fair invitations</span>
+                  <span className="text-gray-700">
+                    Exclusive job fair invitations
+                  </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
-                  <span className="text-gray-700">Career tips and success stories</span>
+                  <span className="text-gray-700">
+                    Career tips and success stories
+                  </span>
                 </li>
               </ul>
             </div>
@@ -57,12 +94,16 @@ const Newsletter = () => {
                 Join Our Learning Community
               </h3>
               <p className="text-gray-600 mb-6">
-                Subscribe to receive weekly updates and career tips directly to your inbox.
+                Subscribe to receive weekly updates and career tips directly to
+                your inbox.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Email Address
                   </label>
                   <input
@@ -76,28 +117,29 @@ const Newsletter = () => {
                   />
                 </div>
 
-                <Button 
+                <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-orange-500 to-cyan-500 hover:from-orange-600 hover:to-cyan-600 text-white py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   Subscribe Now
-                  <svg 
-                    className="w-5 h-5 ml-2" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-5 h-5 ml-2"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                     />
                   </svg>
                 </Button>
 
                 <p className="text-xs text-gray-500 text-center">
-                  By subscribing, you agree to receive updates from Skill India. Unsubscribe anytime.
+                  By subscribing, you agree to receive updates from Skill India.
+                  Unsubscribe anytime.
                 </p>
               </form>
             </div>
@@ -127,7 +169,7 @@ const Newsletter = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Newsletter
+export default Newsletter;

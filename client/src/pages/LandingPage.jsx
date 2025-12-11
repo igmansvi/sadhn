@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import Navbar from "../components/landing/Navbar";
 import HeroSection from "../components/landing/HeroSection";
 import Footer from "../components/landing/Footer";
@@ -10,7 +10,7 @@ const LandingPage = () => {
       <HeroSection />
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { Button } from "../ui/button";
 
 const Start = () => {
@@ -7,24 +7,24 @@ const Start = () => {
       <div className="flex justify-center mb-8">
         <div className="bg-white rounded-full px-6 py-2 shadow-sm flex items-center gap-2">
           <div className="flex -space-x-2">
-            <img 
-              src="https://i.pravatar.cc/40?img=0" 
-              alt="User 1" 
+            <img
+              src="https://i.pravatar.cc/40?img=0"
+              alt="User 1"
               className="w-8 h-8 rounded-full border-2 border-white"
             />
-            <img 
-              src="https://i.pravatar.cc/40?img=1" 
-              alt="User 2" 
+            <img
+              src="https://i.pravatar.cc/40?img=1"
+              alt="User 2"
               className="w-8 h-8 rounded-full border-2 border-white"
             />
-            <img 
-              src="https://i.pravatar.cc/40?img=69" 
-              alt="User 3" 
+            <img
+              src="https://i.pravatar.cc/40?img=69"
+              alt="User 3"
               className="w-8 h-8 rounded-full border-2 border-white"
             />
-            <img 
-              src="https://i.pravatar.cc/40?img=70" 
-              alt="User 3" 
+            <img
+              src="https://i.pravatar.cc/40?img=70"
+              alt="User 3"
               className="w-8 h-8 rounded-full border-2 border-white"
             />
           </div>
@@ -37,7 +37,8 @@ const Start = () => {
         Empowering India Through Skills
       </h1>
       <h2 className="text-4xl font-semibold text-center text-gray-900 mb-8 leading-tight">
-        Learn in-demand skills, earn certifications, and connect with top employers.
+        Learn in-demand skills, earn certifications, and connect with top
+        employers.
       </h2>
 
       {/* CTA Button */}
@@ -50,7 +51,7 @@ const Start = () => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Start
+export default Start;

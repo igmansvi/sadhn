@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { Button } from "./ui/button";
 
 const Navbar = () => {
@@ -10,28 +10,52 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-8 text-sm">
-        <a href="#highlights" className="text-gray-700 hover:text-gray-900 transition-colors">
+        <a
+          href="#highlights"
+          className="text-gray-700 hover:text-gray-900 transition-colors"
+        >
           Highlights
         </a>
-        <a href="#skills" className="text-gray-700 hover:text-gray-900 transition-colors">
+        <a
+          href="#skills"
+          className="text-gray-700 hover:text-gray-900 transition-colors"
+        >
           Skills
         </a>
-        <a href="#courses" className="text-gray-700 hover:text-gray-900 transition-colors">
+        <a
+          href="#courses"
+          className="text-gray-700 hover:text-gray-900 transition-colors"
+        >
           Courses
         </a>
-        <a href="#working" className="text-gray-700 hover:text-gray-900 transition-colors">
+        <a
+          href="#working"
+          className="text-gray-700 hover:text-gray-900 transition-colors"
+        >
           Working
         </a>
-        <a href="#parteners" className="text-gray-700 hover:text-gray-900 transition-colors">
+        <a
+          href="#parteners"
+          className="text-gray-700 hover:text-gray-900 transition-colors"
+        >
           Parteners
         </a>
-        <a href="#stories" className="text-gray-700 hover:text-gray-900 transition-colors">
+        <a
+          href="#stories"
+          className="text-gray-700 hover:text-gray-900 transition-colors"
+        >
           Stories
         </a>
-        <a href="#about" className="text-gray-700 hover:text-gray-900 transition-colors">
+        <a
+          href="#about"
+          className="text-gray-700 hover:text-gray-900 transition-colors"
+        >
           About
         </a>
-        <a href="#contact" className="text-gray-700 hover:text-gray-900 transition-colors">
+        <a
+          href="#contact"
+          className="text-gray-700 hover:text-gray-900 transition-colors"
+        >
           Contact us
         </a>
       </div>
@@ -42,7 +66,7 @@ const Navbar = () => {
         </Button>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
