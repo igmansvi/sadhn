@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Form,
   FormControl,
@@ -7,21 +7,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { useForm } from 'react-hook-form';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useForm } from "react-hook-form";
 
 const Certification = () => {
   const [certifications, setCertifications] = useState([]);
 
   const form = useForm({
     defaultValues: {
-      name: '',
-      issuer: '',
-      issueDate: '',
-      expiryDate: '',
-      credentialId: '',
-      url: '',
+      name: "",
+      issuer: "",
+      issueDate: "",
+      expiryDate: "",
+      credentialId: "",
+      url: "",
     },
   });
 
@@ -33,7 +33,7 @@ const Certification = () => {
     };
     setCertifications([...certifications, certificationData]);
     form.reset();
-    console.log('Certifications:', [...certifications, certificationData]);
+    console.log("Certifications:", [...certifications, certificationData]);
   };
 
   const removeCertification = (index) => {
@@ -43,7 +43,9 @@ const Certification = () => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-[28px] font-bold text-[#333] mb-2">Certifications</h2>
+        <h2 className="text-[28px] font-bold text-[#333] mb-2">
+          Certifications
+        </h2>
         <p className="text-[14px] text-[#666]">
           Add your professional certifications and credentials
         </p>
@@ -54,12 +56,15 @@ const Certification = () => {
           <FormField
             control={form.control}
             name="name"
-            rules={{ required: 'Certification name is required' }}
+            rules={{ required: "Certification name is required" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Certification Name *</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., AWS Certified Solutions Architect" {...field} />
+                  <Input
+                    placeholder="e.g., AWS Certified Solutions Architect"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -120,7 +125,10 @@ const Certification = () => {
               <FormItem>
                 <FormLabel>Credential ID</FormLabel>
                 <FormControl>
-                  <Input placeholder="Unique certification identifier" {...field} />
+                  <Input
+                    placeholder="Unique certification identifier"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -134,10 +142,10 @@ const Certification = () => {
               <FormItem>
                 <FormLabel>Certificate URL</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="url" 
-                    placeholder="https://example.com/verify" 
-                    {...field} 
+                  <Input
+                    type="url"
+                    placeholder="https://example.com/verify"
+                    {...field}
                   />
                 </FormControl>
                 <FormDescription>
@@ -159,7 +167,9 @@ const Certification = () => {
 
       {certifications.length > 0 && (
         <div className="mt-8 pt-6 border-t-2 border-[#eee]">
-          <h3 className="text-[22px] font-semibold text-[#7494ec] mb-4">Added Certifications</h3>
+          <h3 className="text-[22px] font-semibold text-[#7494ec] mb-4">
+            Added Certifications
+          </h3>
           <div className="space-y-4">
             {certifications.map((cert, index) => (
               <div
@@ -170,36 +180,36 @@ const Certification = () => {
                   <div className="flex-1">
                     <h4 className="font-semibold text-lg">{cert.name}</h4>
                     {cert.issuer && (
-                      <p className="text-gray-600 mt-1">{cert.issuer}</p>
+                      <p className="text-gray-600 mt-1">By {cert.issuer}</p>
                     )}
                     <div className="mt-2 space-y-1 text-sm text-gray-600">
                       {cert.issueDate && (
                         <p>
-                          <span className="font-medium">Issued:</span>{' '}
+                          <span className="font-medium">Issued:</span>{" "}
                           {new Date(cert.issueDate).toLocaleDateString()}
                         </p>
                       )}
                       {cert.expiryDate && (
                         <p>
-                          <span className="font-medium">Expires:</span>{' '}
+                          <span className="font-medium">Expires:</span>{" "}
                           {new Date(cert.expiryDate).toLocaleDateString()}
                         </p>
                       )}
                       {cert.credentialId && (
                         <p>
-                          <span className="font-medium">Credential ID:</span>{' '}
+                          <span className="font-medium">Credential ID:</span>{" "}
                           {cert.credentialId}
                         </p>
                       )}
                       {cert.url && (
                         <p>
-                          <a 
-                            href={cert.url} 
-                            target="_blank" 
+                          <a
+                            href={cert.url}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:underline"
                           >
-                            View Credential →
+                            View Certificate →
                           </a>
                         </p>
                       )}
