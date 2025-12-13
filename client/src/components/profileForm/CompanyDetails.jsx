@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   Form,
   FormControl,
@@ -9,10 +10,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
+import { useFormData } from '../../pages/ProfileForm';
 
 const CompanyDetails = () => {
+  const { formData, updateFormData } = useFormData();
+  const savedData = formData.companyDetails || {};
+  
   const form = useForm({
-    defaultValues: {
+    defaultValues: savedData.name ? savedData : {
       name: '',
       industry: '',
       size: '',
@@ -20,6 +25,14 @@ const CompanyDetails = () => {
       description: '',
     },
   });
+
+  // Save form data to context whenever it changes
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      updateFormData('companyDetails', value);
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   const onSubmit = (data) => {
     const companyData = {

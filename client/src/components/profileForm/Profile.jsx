@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Form,
   FormControl,
@@ -10,18 +10,23 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
+import { useFormData } from '../../pages/ProfileForm';
 
 const Profile = () => {
-  const [languages, setLanguages] = useState([]);
-  const [preferredLocations, setPreferredLocations] = useState([]);
-  const [otherLinks, setOtherLinks] = useState([]);
+  const { formData, updateFormData } = useFormData();
+  const savedData = formData.profile || {};
+  
+  const [languages, setLanguages] = useState(savedData.languages || []);
+  const [preferredLocations, setPreferredLocations] = useState(savedData.preferredLocations || []);
+  const [otherLinks, setOtherLinks] = useState(savedData.otherLinks || []);
   const [languageName, setLanguageName] = useState('');
   const [languageProficiency, setLanguageProficiency] = useState('basic');
   const [locationInput, setLocationInput] = useState('');
   const [linkInput, setLinkInput] = useState('');
+  const [uploadedFile, setUploadedFile] = useState(null);
 
   const form = useForm({
-    defaultValues: {
+    defaultValues: savedData.profileType ? savedData : {
       profileType: 'learner',
       headline: '',
       summary: '',
@@ -42,6 +47,30 @@ const Profile = () => {
       isPublic: true,
     },
   });
+
+  // Save form data to context whenever it changes
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      updateFormData('profile', {
+        ...value,
+        languages,
+        preferredLocations,
+        otherLinks,
+      });
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch, languages, preferredLocations, otherLinks]);
+
+  // Update arrays in context when they change
+  useEffect(() => {
+    const currentValues = form.getValues();
+    updateFormData('profile', {
+      ...currentValues,
+      languages,
+      preferredLocations,
+      otherLinks,
+    });
+  }, [languages, preferredLocations, otherLinks]);
 
   const addLanguage = () => {
     if (languageName.trim()) {
@@ -551,7 +580,11 @@ const Profile = () => {
                   <FormItem>
                     <FormLabel>Available From</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input 
+                        type="date" 
+                        {...field} 
+                        className="py-[13px] px-5 bg-[#eee] rounded-lg border-none text-[#333] font-medium text-base"
+                      />
                     </FormControl>
                     <FormDescription>
                       When can you start working?
@@ -625,6 +658,93 @@ const Profile = () => {
               </div>
             </div>
           )}
+
+          {/* Privacy & Resume */}
+          <div className="space-y-5">
+            <h3 className="text-[20px] font-semibold text-[#7494ec] border-b-2 border-[#7494ec] pb-2">Privacy & Resume</h3>
+            
+            <FormField
+              control={form.control}
+              name="isPublic"
+              render={({ field }) => (
+                <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="w-5 h-5 text-[#7494ec] border-gray-300 rounded focus:ring-[#7494ec]"
+                    />
+                  </FormControl>
+                  <div className="flex-1">
+                    <FormLabel className="!mt-0 cursor-pointer font-semibold">
+                      Make my profile public
+                    </FormLabel>
+                    <FormDescription className="text-xs mt-1">
+                      Allow employers to find and view your profile
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-3">
+              <FormLabel>Upload Resume/CV</FormLabel>
+              <div className="border-2 border-dashed border-[#7494ec] rounded-lg p-6 text-center hover:bg-[#7494ec]/5 transition-colors">
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (file.size > 5 * 1024 * 1024) {
+                        alert('File size must be less than 5MB');
+                        return;
+                      }
+                      setUploadedFile(file);
+                      console.log('Resume uploaded:', file.name);
+                      // Handle file upload here
+                    }
+                  }}
+                  className="hidden"
+                  id="resume-upload"
+                />
+                {!uploadedFile ? (
+                  <label
+                    htmlFor="resume-upload"
+                    className="cursor-pointer flex flex-col items-center gap-2"
+                  >
+                    <i className="bx bx-cloud-upload text-4xl text-[#7494ec]"></i>
+                    <span className="text-[#333] font-medium">Click to upload your resume</span>
+                    <span className="text-xs text-[#666]">Supported formats: PDF, DOC, DOCX (Max 5MB)</span>
+                  </label>
+                ) : (
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center gap-3 bg-[#7494ec]/10 px-4 py-3 rounded-lg w-full max-w-md">
+                      <i className="bx bxs-file-pdf text-3xl text-[#7494ec]"></i>
+                      <div className="flex-1 text-left">
+                        <p className="text-[#333] font-medium text-sm truncate">{uploadedFile.name}</p>
+                        <p className="text-xs text-[#666]">{(uploadedFile.size / 1024).toFixed(2)} KB</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setUploadedFile(null)}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        <i className="bx bx-trash text-xl"></i>
+                      </button>
+                    </div>
+                    <label
+                      htmlFor="resume-upload"
+                      className="text-[#7494ec] hover:underline cursor-pointer text-sm font-medium"
+                    >
+                      Upload a different file
+                    </label>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
           <button
             type="submit"

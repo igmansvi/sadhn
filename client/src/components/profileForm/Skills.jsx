@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -10,11 +10,18 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
+import { useFormData } from '../../pages/ProfileForm';
 
 const Skills = () => {
-  const [skills, setSkills] = useState([]);
+  const { formData, updateFormData } = useFormData();
+  const [skills, setSkills] = useState(formData.skills || []);
   const [certifications, setCertifications] = useState([]);
   const [certInput, setCertInput] = useState("");
+
+  // Update context whenever skills change
+  useEffect(() => {
+    updateFormData('skills', skills);
+  }, [skills]);
 
   const form = useForm({
     defaultValues: {
@@ -136,7 +143,11 @@ const Skills = () => {
               <FormItem>
                 <FormLabel>Last Used</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input 
+                    type="date" 
+                    {...field} 
+                    className="py-[13px] px-5 bg-[#eee] rounded-lg border-none text-[#333] font-medium text-base"
+                  />
                 </FormControl>
                 <FormDescription>
                   When did you last use this skill?

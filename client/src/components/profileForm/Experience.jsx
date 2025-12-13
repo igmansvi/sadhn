@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Form,
   FormControl,
@@ -9,11 +9,18 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
+import { useFormData } from '../../pages/ProfileForm';
 
 const Experience = () => {
-  const [experiences, setExperiences] = useState([]);
+  const { formData, updateFormData } = useFormData();
+  const [experiences, setExperiences] = useState(formData.experience || []);
   const [skills, setSkills] = useState([]);
   const [skillInput, setSkillInput] = useState('');
+
+  // Update context whenever experiences change
+  useEffect(() => {
+    updateFormData('experience', experiences);
+  }, [experiences]);
 
   const form = useForm({
     defaultValues: {
@@ -151,7 +158,11 @@ const Experience = () => {
                 <FormItem>
                   <FormLabel>Start Date *</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input 
+                      type="date" 
+                      {...field} 
+                      className="py-[13px] px-5 bg-[#eee] rounded-lg border-none text-[#333] font-medium text-base"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -176,6 +187,7 @@ const Experience = () => {
                       type="date" 
                       {...field}
                       disabled={watchIsCurrent}
+                      className="py-[13px] px-5 bg-[#eee] rounded-lg border-none text-[#333] font-medium text-base disabled:opacity-50"
                     />
                   </FormControl>
                   <FormMessage />

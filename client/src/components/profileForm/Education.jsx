@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Form,
   FormControl,
@@ -9,9 +9,16 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
+import { useFormData } from '../../pages/ProfileForm';
 
 const Education = () => {
-  const [educationList, setEducationList] = useState([]);
+  const { formData, updateFormData } = useFormData();
+  const [educationList, setEducationList] = useState(formData.education || []);
+
+  // Update context whenever education list changes
+  useEffect(() => {
+    updateFormData('education', educationList);
+  }, [educationList]);
 
   const form = useForm({
     defaultValues: {
@@ -111,7 +118,11 @@ const Education = () => {
                 <FormItem>
                   <FormLabel>Start Date</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input 
+                      type="date" 
+                      {...field} 
+                      className="py-[13px] px-5 bg-[#eee] rounded-lg border-none text-[#333] font-medium text-base"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,7 +136,11 @@ const Education = () => {
                 <FormItem>
                   <FormLabel>End Date</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input 
+                      type="date" 
+                      {...field} 
+                      className="py-[13px] px-5 bg-[#eee] rounded-lg border-none text-[#333] font-medium text-base"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

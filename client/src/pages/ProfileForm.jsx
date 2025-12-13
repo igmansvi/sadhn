@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, createContext, useContext } from "react";
 import Skills from "../components/profileForm/Skills.jsx";
 import Certification from "../components/profileForm/Certification.jsx";
 import Education from "../components/profileForm/Education.jsx";
@@ -6,8 +6,64 @@ import Experience from "../components/profileForm/Experience.jsx";
 import Profile from "../components/profileForm/Profile.jsx";
 import CompanyDetails from "../components/profileForm/CompanyDetails.jsx";
 
+// Create context for form data persistence
+const FormDataContext = createContext();
+
+export const useFormData = () => {
+  const context = useContext(FormDataContext);
+  if (!context) {
+    throw new Error('useFormData must be used within FormDataProvider');
+  }
+  return context;
+};
+
 const ProfileForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  
+  // State to persist form data across steps
+  const [formData, setFormData] = useState({
+    profile: {
+      profileType: 'learner',
+      headline: '',
+      summary: '',
+      city: '',
+      state: '',
+      country: '',
+      phone: '',
+      website: '',
+      github: '',
+      linkedin: '',
+      jobTypes: [],
+      workMode: [],
+      minSalary: '',
+      maxSalary: '',
+      currency: 'INR',
+      availableFrom: '',
+      willingToRelocate: false,
+      isPublic: true,
+      languages: [],
+      preferredLocations: [],
+      otherLinks: [],
+    },
+    companyDetails: {
+      name: '',
+      industry: '',
+      size: '',
+      website: '',
+      description: '',
+    },
+    education: [],
+    experience: [],
+    skills: [],
+    certifications: [],
+  });
+
+  const updateFormData = (section, data) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: data,
+    }));
+  };
 
   const steps = [
     { name: "Profile", component: Profile, icon: "bxs-user" },
@@ -41,7 +97,8 @@ const ProfileForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-[#e2e2e2] to-[#c9d6ff] py-8 px-4">
+    <FormDataContext.Provider value={{ formData, updateFormData }}>
+      <div className="min-h-screen bg-gradient-to-r from-[#e2e2e2] to-[#c9d6ff] py-8 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header Card */}
         <div className="bg-white rounded-[30px] shadow-[0_0_30px_rgba(0,0,0,0.2)] p-8 mb-6">
@@ -67,7 +124,7 @@ const ProfileForm = () => {
             {/* Progress Line */}
             <div className="absolute top-6 left-0 w-full h-[3px] bg-[#eee] -z-10 max-[768px]:hidden">
               <div
-                className="h-full bg-[#7494ec] transition-all duration-500 ease-in-out"
+                className="h-full bg-gradient-to-r from-[#7494ec] to-[#7494ec]/40 transition-all duration-500 ease-in-out"
                 style={{
                   width: `${(currentStep / (steps.length - 1)) * 100}%`,
                 }}
@@ -136,7 +193,10 @@ const ProfileForm = () => {
               </button>
             ) : (
               <button
-                onClick={() => console.log("Form submitted!")}
+                onClick={() => {
+                  console.log("Form submitted! All data:", formData);
+                  // Here you would send formData to your backend
+                }}
                 className="px-6 py-3 bg-[#7494ec] text-white rounded-lg font-semibold hover:bg-[#6383db] transition-all shadow-[0_0_10px_rgba(0,0,0,0.1)]"
               >
                 Submit Profile
@@ -153,6 +213,7 @@ const ProfileForm = () => {
         rel="stylesheet"
       />
     </div>
+    </FormDataContext.Provider>
   );
 };
 

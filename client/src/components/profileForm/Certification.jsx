@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Form,
   FormControl,
@@ -7,12 +7,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useForm } from 'react-hook-form';
+import { useFormData } from '../../pages/ProfileForm';
 
 const Certification = () => {
-  const [certifications, setCertifications] = useState([]);
+  const { formData, updateFormData } = useFormData();
+  const [certifications, setCertifications] = useState(formData.certifications || []);
+
+  // Update context whenever certifications change
+  useEffect(() => {
+    updateFormData('certifications', certifications);
+  }, [certifications]);
 
   const form = useForm({
     defaultValues: {
@@ -93,7 +100,11 @@ const Certification = () => {
                 <FormItem>
                   <FormLabel>Issue Date</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input 
+                      type="date" 
+                      {...field} 
+                      className="py-[13px] px-5 bg-[#eee] rounded-lg border-none text-[#333] font-medium text-base"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,7 +118,11 @@ const Certification = () => {
                 <FormItem>
                   <FormLabel>Expiry Date</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input 
+                      type="date" 
+                      {...field} 
+                      className="py-[13px] px-5 bg-[#eee] rounded-lg border-none text-[#333] font-medium text-base"
+                    />
                   </FormControl>
                   <FormDescription>
                     Leave empty if certification doesn't expire
