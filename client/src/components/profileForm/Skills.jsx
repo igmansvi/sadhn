@@ -56,10 +56,10 @@ const Skills = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Skills</h2>
-        <p className="text-gray-600 mb-6">
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-[28px] font-bold text-[#333] mb-2">Skills</h2>
+        <p className="text-[14px] text-[#666]">
           Add your professional skills and expertise
         </p>
       </div>
@@ -161,26 +161,26 @@ const Skills = () => {
                   }
                 }}
               />
-              <Button
+              <button
                 type="button"
                 onClick={addCertification}
-                variant="outline"
+                className="px-4 py-2 bg-white border-2 border-[#7494ec] text-[#7494ec] rounded-lg hover:bg-[#7494ec] hover:text-white transition-colors font-semibold"
               >
                 Add
-              </Button>
+              </button>
             </div>
             {certifications.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {certifications.map((cert, index) => (
                   <div
                     key={index}
-                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                    className="bg-[#7494ec]/10 text-[#7494ec] px-3 py-1 rounded-full text-sm flex items-center gap-2 font-medium"
                   >
                     {cert}
                     <button
                       type="button"
                       onClick={() => removeCertification(index)}
-                      className="text-blue-600 hover:text-blue-800 font-bold"
+                      className="text-[#7494ec] hover:text-[#6383db] font-bold text-lg leading-none"
                     >
                       ×
                     </button>
@@ -190,20 +190,23 @@ const Skills = () => {
             )}
           </div>
 
-          <Button type="submit" className="w-full">
+          <button
+            type="submit"
+            className="w-full h-12 bg-[#7494ec] rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] border-none cursor-pointer text-base text-white font-semibold hover:bg-[#6383db] transition-colors"
+          >
             Add Skill
-          </Button>
+          </button>
         </form>
       </Form>
 
       {skills.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4">Added Skills</h3>
+        <div className="mt-8 pt-6 border-t-2 border-[#eee]">
+          <h3 className="text-[22px] font-semibold text-[#7494ec] mb-4">Added Skills</h3>
           <div className="space-y-4">
             {skills.map((skill, index) => (
               <div
                 key={index}
-                className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
+                className="border-2 border-[#eee] rounded-lg p-5 bg-white shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
@@ -242,25 +245,19 @@ const Skills = () => {
                       )}
                     </div>
                   </div>
-                  <Button
+                  <button
                     type="button"
-                    variant="destructive"
-                    size="sm"
                     onClick={() => removeSkill(index)}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-semibold"
                   >
                     Remove
-                  </Button>
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         </div>
       )}
-
-      <div className="flex justify-between">
-        <Button className="w-40">Prev</Button>
-        <Button className="w-40">Next</Button>
-      </div>
     </div>
   );
 };

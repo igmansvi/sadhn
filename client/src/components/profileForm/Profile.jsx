@@ -114,10 +114,10 @@ const Profile = () => {
   const profileType = form.watch('profileType');
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Profile Information</h2>
-        <p className="text-gray-600 mb-6">
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-[28px] font-bold text-[#333] mb-2">Profile Information</h2>
+        <p className="text-[14px] text-[#666]">
           Complete your profile to get better opportunities
         </p>
       </div>
@@ -134,7 +134,7 @@ const Profile = () => {
                 <FormControl>
                   <select
                     {...field}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full py-[13px] px-5 bg-[#eee] rounded-lg border-none outline-none text-[#333] font-medium"
                   >
                     <option value="learner">Learner</option>
                     <option value="employer">Employer</option>
@@ -146,8 +146,8 @@ const Profile = () => {
           />
 
           {/* Basic Information */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold border-b pb-2">Basic Information</h3>
+          <div className="space-y-5">
+            <h3 className="text-[20px] font-semibold text-[#7494ec] border-b-2 border-[#7494ec] pb-2">Basic Information</h3>
             
             <FormField
               control={form.control}
@@ -183,7 +183,7 @@ const Profile = () => {
                       {...field}
                       rows="6"
                       placeholder="Tell us about yourself, your experience, and career goals..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full py-[13px] px-5 bg-[#eee] rounded-lg border-none outline-none text-[#333] font-medium placeholder:text-[#888] resize-none"
                       maxLength={2000}
                     />
                   </FormControl>
@@ -215,8 +215,8 @@ const Profile = () => {
           </div>
 
           {/* Location */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold border-b pb-2">Location</h3>
+          <div className="space-y-5">
+            <h3 className="text-[20px] font-semibold text-[#7494ec] border-b-2 border-[#7494ec] pb-2">Location</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
@@ -264,8 +264,8 @@ const Profile = () => {
           </div>
 
           {/* Portfolio Links */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold border-b pb-2">Portfolio & Social Links</h3>
+          <div className="space-y-5">
+            <h3 className="text-[20px] font-semibold text-[#7494ec] border-b-2 border-[#7494ec] pb-2">Portfolio & Social Links</h3>
             
             <FormField
               control={form.control}
@@ -336,9 +336,13 @@ const Profile = () => {
                     }
                   }}
                 />
-                <Button type="button" onClick={addLink} variant="outline">
+                <button
+                  type="button"
+                  onClick={addLink}
+                  className="px-4 py-2 bg-white border-2 border-[#7494ec] text-[#7494ec] rounded-lg hover:bg-[#7494ec] hover:text-white transition-colors font-semibold"
+                >
                   Add
-                </Button>
+                </button>
               </div>
               {otherLinks.length > 0 && (
                 <div className="space-y-2 mt-2">
@@ -362,8 +366,8 @@ const Profile = () => {
           </div>
 
           {/* Languages */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold border-b pb-2">Languages</h3>
+          <div className="space-y-5">
+            <h3 className="text-[20px] font-semibold text-[#7494ec] border-b-2 border-[#7494ec] pb-2">Languages</h3>
             
             <div className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -381,29 +385,33 @@ const Profile = () => {
                 <select
                   value={languageProficiency}
                   onChange={(e) => setLanguageProficiency(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="py-[13px] px-5 bg-[#eee] rounded-lg border-none outline-none text-[#333] font-medium"
                 >
                   <option value="basic">Basic</option>
                   <option value="conversational">Conversational</option>
                   <option value="fluent">Fluent</option>
                   <option value="native">Native</option>
                 </select>
-                <Button type="button" onClick={addLanguage} variant="outline">
+                <button
+                  type="button"
+                  onClick={addLanguage}
+                  className="px-4 py-2 bg-white border-2 border-[#7494ec] text-[#7494ec] rounded-lg hover:bg-[#7494ec] hover:text-white transition-colors font-semibold"
+                >
                   Add Language
-                </Button>
+                </button>
               </div>
               {languages.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {languages.map((lang, index) => (
                     <div
                       key={index}
-                      className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                      className="bg-[#7494ec]/10 text-[#7494ec] px-3 py-1 rounded-full text-sm flex items-center gap-2 font-medium"
                     >
                       {lang.name} ({lang.proficiency})
                       <button
                         type="button"
                         onClick={() => removeLanguage(index)}
-                        className="text-purple-600 hover:text-purple-800 font-bold"
+                        className="text-[#7494ec] hover:text-[#6383db] font-bold text-lg leading-none"
                       >
                         ×
                       </button>
@@ -416,8 +424,8 @@ const Profile = () => {
 
           {/* Job Preferences (for learners) */}
           {profileType === 'learner' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold border-b pb-2">Job Preferences</h3>
+            <div className="space-y-5">
+              <h3 className="text-[20px] font-semibold text-[#7494ec] border-b-2 border-[#7494ec] pb-2">Job Preferences</h3>
               
               <FormField
                 control={form.control}
@@ -524,7 +532,7 @@ const Profile = () => {
                         <FormControl>
                           <select
                             {...field}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full py-[13px] px-5 bg-[#eee] rounded-lg border-none outline-none text-[#333] font-medium"
                           >
                             <option value="INR">INR</option>
                             <option value="USD">USD</option>
@@ -590,22 +598,26 @@ const Profile = () => {
                       }
                     }}
                   />
-                  <Button type="button" onClick={addLocation} variant="outline">
+                  <button
+                    type="button"
+                    onClick={addLocation}
+                    className="px-4 py-2 bg-white border-2 border-[#7494ec] text-[#7494ec] rounded-lg hover:bg-[#7494ec] hover:text-white transition-colors font-semibold"
+                  >
                     Add
-                  </Button>
+                  </button>
                 </div>
                 {preferredLocations.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {preferredLocations.map((location, index) => (
                       <div
                         key={index}
-                        className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                        className="bg-[#7494ec]/10 text-[#7494ec] px-3 py-1 rounded-full text-sm flex items-center gap-2 font-medium"
                       >
                         {location}
                         <button
                           type="button"
                           onClick={() => removeLocation(index)}
-                          className="text-blue-600 hover:text-blue-800 font-bold"
+                          className="text-[#7494ec] hover:text-[#6383db] font-bold text-lg leading-none"
                         >
                           ×
                         </button>
@@ -618,8 +630,8 @@ const Profile = () => {
           )}
 
           {/* Privacy */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold border-b pb-2">Privacy</h3>
+          <div className="space-y-5">
+            <h3 className="text-[20px] font-semibold text-[#7494ec] border-b-2 border-[#7494ec] pb-2">Privacy</h3>
             
             <FormField
               control={form.control}
@@ -645,9 +657,12 @@ const Profile = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full" size="lg">
+          <button
+            type="submit"
+            className="w-full h-12 bg-[#7494ec] rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] border-none cursor-pointer text-base text-white font-semibold hover:bg-[#6383db] transition-colors"
+          >
             Save Profile
-          </Button>
+          </button>
         </form>
       </Form>
     </div>

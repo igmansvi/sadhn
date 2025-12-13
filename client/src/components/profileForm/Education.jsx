@@ -42,10 +42,10 @@ const Education = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Education</h2>
-        <p className="text-gray-600 mb-6">
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-[28px] font-bold text-[#333] mb-2">Education</h2>
+        <p className="text-[14px] text-[#666]">
           Add your educational background and qualifications
         </p>
       </div>
@@ -155,20 +155,23 @@ const Education = () => {
             )}
           />
 
-          <Button type="submit" className="w-full">
+          <button
+            type="submit"
+            className="w-full h-12 bg-[#7494ec] rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] border-none cursor-pointer text-base text-white font-semibold hover:bg-[#6383db] transition-colors"
+          >
             Add Education
-          </Button>
+          </button>
         </form>
       </Form>
 
       {educationList.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4">Added Education</h3>
+        <div className="mt-8 pt-6 border-t-2 border-[#eee]">
+          <h3 className="text-[22px] font-semibold text-[#7494ec] mb-4">Added Education</h3>
           <div className="space-y-4">
             {educationList.map((edu, index) => (
               <div
                 key={index}
-                className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
+                className="border-2 border-[#eee] rounded-lg p-5 bg-white shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
@@ -195,14 +198,13 @@ const Education = () => {
                       )}
                     </div>
                   </div>
-                  <Button
+                  <button
                     type="button"
-                    variant="destructive"
-                    size="sm"
                     onClick={() => removeEducation(index)}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-semibold"
                   >
                     Remove
-                  </Button>
+                  </button>
                 </div>
               </div>
             ))}
