@@ -9,13 +9,11 @@ const OverviewSection = ({ profile }) => {
 
   return (
     <div className="space-y-4">
-      {/* About */}
       <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">About</h3>
         <p className="text-gray-700 text-sm leading-relaxed">{profile.summary}</p>
       </div>
 
-      {/* Primary Skills */}
       <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Top Skills</h3>
         <div className="flex flex-wrap gap-2">
@@ -27,7 +25,6 @@ const OverviewSection = ({ profile }) => {
         </div>
       </div>
 
-      {/* Education */}
       <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Education</h3>
         {profile.education.map((edu, index) => (
@@ -139,7 +136,6 @@ const OverviewSection = ({ profile }) => {
         </div>
       </div>
 
-      {/* Resume */}
       <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
         <div className="flex items-center justify-between">
           <div>

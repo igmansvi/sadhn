@@ -51,7 +51,6 @@ const SettingsSection = ({ profile, updateProfile }) => {
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-gray-900">Settings</h2>
 
-      {/* Account Settings */}
       <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Account Settings</h3>
         <div className="space-y-3">
@@ -108,7 +107,6 @@ const SettingsSection = ({ profile, updateProfile }) => {
         </div>
       </div>
 
-      {/* Danger Zone */}
       <div className="rounded-xl border border-red-200 shadow-sm bg-red-50 p-4">
         <h3 className="text-sm font-semibold text-red-600 mb-3">Danger Zone</h3>
         <div className="flex items-center justify-between py-2">
@@ -130,7 +128,6 @@ const SettingsSection = ({ profile, updateProfile }) => {
         </div>
       </div>
 
-      {/* Email Change Modal */}
       <Dialog open={showEmailModal} onOpenChange={setShowEmailModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -165,7 +162,6 @@ const SettingsSection = ({ profile, updateProfile }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Password Change Modal */}
       <Dialog open={showPasswordModal} onOpenChange={setShowPasswordModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -217,7 +213,7 @@ const SettingsSection = ({ profile, updateProfile }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Profile Picture Modal */}
+
       <Dialog open={showPictureModal} onOpenChange={setShowPictureModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>

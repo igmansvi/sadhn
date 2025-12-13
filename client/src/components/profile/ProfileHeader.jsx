@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 
-// Helper function to get initials from name
 const getInitials = (name) => {
   if (!name) return 'U';
   const parts = name.trim().split(' ');
@@ -15,9 +14,6 @@ const getInitials = (name) => {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 };
 
-// ---------------------------
-// Fixed Circular Progress Component
-// ---------------------------
 const CircularProgress = ({ percentage, name, avatar }) => {
   const size = 95;
   const strokeWidth = 6;
@@ -33,7 +29,6 @@ const CircularProgress = ({ percentage, name, avatar }) => {
         className="block"
         style={{ transform: "rotate(-90deg)" }}
       >
-        {/* Background Track */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -43,7 +38,6 @@ const CircularProgress = ({ percentage, name, avatar }) => {
           fill="none"
         />
 
-        {/* Progress Arc */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -58,7 +52,6 @@ const CircularProgress = ({ percentage, name, avatar }) => {
         />
       </svg>
 
-      {/* Avatar Centered */}
       <div className="absolute inset-0 flex items-center justify-center">
         {avatar ? (
           <img
@@ -76,13 +69,9 @@ const CircularProgress = ({ percentage, name, avatar }) => {
   );
 };
 
-// ---------------------------
-// MAIN PROFILE HEADER
-// ---------------------------
 const ProfileHeader = ({ profile, updateProfile }) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
-  // Debug log
   console.log('ProfileHeader - profile.name:', profile.name);
   console.log('ProfileHeader - full profile:', profile);
 
@@ -108,7 +97,6 @@ const ProfileHeader = ({ profile, updateProfile }) => {
 
   return (
     <>
-      {/* HEADER */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-5">
           <div className="flex items-center gap-6">
@@ -148,7 +136,6 @@ const ProfileHeader = ({ profile, updateProfile }) => {
               </div>
             </div>
 
-            {/* EDIT BUTTON */}
             <button
               onClick={handleOpen}
               className="flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition text-sm font-medium"
@@ -160,7 +147,6 @@ const ProfileHeader = ({ profile, updateProfile }) => {
         </div>
       </div>
 
-      {/* EDIT MODAL */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
@@ -168,7 +154,6 @@ const ProfileHeader = ({ profile, updateProfile }) => {
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Headline */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Headline
@@ -183,7 +168,6 @@ const ProfileHeader = ({ profile, updateProfile }) => {
               />
             </div>
 
-            {/* Summary */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 About
@@ -198,7 +182,6 @@ const ProfileHeader = ({ profile, updateProfile }) => {
               />
             </div>
 
-            {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Phone
@@ -214,7 +197,6 @@ const ProfileHeader = ({ profile, updateProfile }) => {
             </div>
           </div>
 
-          {/* BUTTONS */}
           <div className="flex justify-end gap-3 mt-6">
             <button
               onClick={() => setIsEditOpen(false)}

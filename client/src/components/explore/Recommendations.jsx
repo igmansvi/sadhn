@@ -1,81 +1,45 @@
-import React from "react";
-import { Card } from "../ui/card";
+import React from 'react';
+import { TrendingUp } from 'lucide-react';
 
-const Recommendations = () => {
-  const recommendations = [
-    { 
-      id: 1, 
-      type: "Skill", 
-      title: "UI/UX Wireframing", 
-      icon: "🎨", 
-      color: "from-pink-500 to-rose-500",
-      description: "Master design fundamentals"
-    },
-    { 
-      id: 2, 
-      type: "Course", 
-      title: "Intro to Data Analysis", 
-      icon: "📊", 
-      color: "from-blue-500 to-indigo-500",
-      description: "Learn data-driven insights"
-    },
-    { 
-      id: 3, 
-      type: "Job", 
-      title: "Junior QA Tester", 
-      icon: "🧪", 
-      color: "from-green-500 to-teal-500",
-      description: "Perfect match for your skills"
-    },
-    { 
-      id: 4, 
-      type: "Mentor", 
-      title: "Connect with AI Expert", 
-      icon: "🤝", 
-      color: "from-purple-500 to-violet-500",
-      description: "Get guidance from experts"
-    },
-    // { 
-    //   id: 5, 
-    //   type: "Skill", 
-    //   title: "UI/UX Wireframing", 
-    //   icon: "🎨", 
-    //   color: "from-pink-500 to-rose-500",
-    //   description: "Master design fundamentals"
-    // }
-  ];
-
+const Recommendations = ({ skillPrograms }) => {
   return (
-    <Card className="bg-gradient-to-br from-amber-100 via-white to-yellow-100 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-amber-200/50 p-3">
-      <div className="flex items-center justify-between mb-1">
-        <h2 className="text-base font-bold bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">
-          Recommendations
-        </h2>
+    <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Recommended Programs</h2>
+          <p className="text-xs text-gray-600 mt-0.5">Based on your skill gaps</p>
+        </div>
+        <TrendingUp size={20} className="text-blue-600" />
       </div>
-      
-      <div className="grid grid-cols-4 gap-2">
-        {recommendations.map((item) => (
-          <div 
-            key={item.id}
-            className="bg-white/70 backdrop-blur-sm rounded-xl p-2.5 border border-amber-200 hover:border-amber-300 transition-all cursor-pointer group hover:shadow-md"
-          >
-            <div className="flex flex-col items-center text-center gap-1.5 p-5">
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-xl shadow-lg group-hover:scale-110 transition-transform`}>
-                {item.icon}
+      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+        {skillPrograms.map((program) => (
+          <div key={program.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between mb-2">
+              <div>
+                <h3 className="font-semibold text-gray-900 text-sm mb-1">{program.title}</h3>
+                <p className="text-xs text-gray-600">{program.provider}</p>
               </div>
-              <div className="flex-1">
-                <div className="text-[10px] font-semibold text-amber-600 mb-0.5">{item.type}</div>
-                <div className="font-bold text-xs text-gray-800 group-hover:text-amber-700 transition-colors line-clamp-1">{item.title}</div>
-                <div className="text-[10px] text-gray-600 mt-0.5 line-clamp-1">{item.description}</div>
-              </div>
-              <button className={`bg-gradient-to-r ${item.color} text-white text-[10px] font-semibold px-2.5 py-1 rounded-lg hover:shadow-lg transition-all group-hover:scale-105 w-full mt-1`}>
-                Explore
+              <span className="px-2 py-1 bg-orange-50 text-orange-700 rounded text-xs font-medium">
+                {program.skillGap}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-gray-600 mb-3">
+              <span>⏱ {program.duration}</span>
+              <span>•</span>
+              <span className="px-1.5 py-0.5 bg-gray-100 rounded">{program.level}</span>
+              <span>•</span>
+              <span>⭐ {program.rating}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-500">{program.enrolled} enrolled</span>
+              <button className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-medium">
+                Enroll Now
               </button>
             </div>
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   );
 };
 

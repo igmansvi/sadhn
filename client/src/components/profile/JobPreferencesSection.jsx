@@ -91,7 +91,6 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {/* Job Types */}
         <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
           <h3 className="text-sm font-semibold text-gray-900 mb-3">Preferred Role</h3>
           <div className="space-y-2">
@@ -110,7 +109,6 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
           </div>
         </div>
 
-        {/* Work Mode */}
         <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
           <h3 className="text-sm font-semibold text-gray-900 mb-3">Work Mode</h3>
           <div className="space-y-2">
@@ -130,7 +128,6 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
         </div>
       </div>
 
-      {/* Expected Salary with Slider */}
       <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
         <div className="flex items-center gap-2 mb-4">
           <DollarSign size={16} className="text-gray-600" />
@@ -185,7 +182,6 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
         </div>
       </div>
 
-      {/* Preferred Locations */}
       <div className="rounded-xl border border-gray-200 shadow-sm bg-white p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
