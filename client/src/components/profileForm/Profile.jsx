@@ -629,34 +629,6 @@ const Profile = () => {
             </div>
           )}
 
-          {/* Privacy */}
-          <div className="space-y-5">
-            <h3 className="text-[20px] font-semibold text-[#7494ec] border-b-2 border-[#7494ec] pb-2">Privacy</h3>
-            
-            <FormField
-              control={form.control}
-              name="isPublic"
-              render={({ field }) => (
-                <FormItem className="flex items-center space-x-2">
-                  <FormControl>
-                    <input
-                      type="checkbox"
-                      checked={field.value}
-                      onChange={field.onChange}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                  </FormControl>
-                  <FormLabel className="!mt-0 cursor-pointer">
-                    Make my profile public
-                  </FormLabel>
-                  <FormDescription className="!mt-0 ml-6">
-                    Allow employers to find your profile
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
-          </div>
-
           <button
             type="submit"
             className="w-full h-12 bg-[#7494ec] rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] border-none cursor-pointer text-base text-white font-semibold hover:bg-[#6383db] transition-colors"

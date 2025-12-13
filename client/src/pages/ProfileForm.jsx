@@ -4,16 +4,22 @@ import Certification from "../components/profileForm/Certification.jsx";
 import Education from "../components/profileForm/Education.jsx";
 import Experience from "../components/profileForm/Experience.jsx";
 import Profile from "../components/profileForm/Profile.jsx";
+import CompanyDetails from "../components/profileForm/CompanyDetails.jsx";
 
 const ProfileForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const steps = [
     { name: "Profile", component: Profile, icon: "bxs-user" },
+    { name: "Company", component: CompanyDetails, icon: "bxs-buildings" },
     { name: "Education", component: Education, icon: "bxs-graduation" },
     { name: "Experience", component: Experience, icon: "bxs-briefcase" },
     { name: "Skills", component: Skills, icon: "bxs-brain" },
-    { name: "Certifications", component: Certification, icon: "bxs-badge-check" },
+    {
+      name: "Certifications",
+      component: Certification,
+      icon: "bxs-badge-check",
+    },
   ];
 
   const CurrentComponent = steps[currentStep].component;
@@ -48,13 +54,23 @@ const ProfileForm = () => {
             </p>
           </div>
 
+          {/* Progress Indicator */}
+          <div className="mt-6 bg-white/50 rounded-full px-2 pb-5 backdrop-blur-sm">
+            <div
+              className="h-2 bg-[#7494ec] rounded-full transition-all duration-500 ease-in-out"
+              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+            ></div>
+          </div>
+
           {/* Stepper */}
           <div className="flex justify-between items-center relative max-[768px]:flex-wrap max-[768px]:gap-3">
             {/* Progress Line */}
             <div className="absolute top-6 left-0 w-full h-[3px] bg-[#eee] -z-10 max-[768px]:hidden">
               <div
                 className="h-full bg-[#7494ec] transition-all duration-500 ease-in-out"
-                style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+                style={{
+                  width: `${(currentStep / (steps.length - 1)) * 100}%`,
+                }}
               ></div>
             </div>
 
@@ -128,14 +144,6 @@ const ProfileForm = () => {
               </button>
             )}
           </div>
-        </div>
-
-        {/* Progress Indicator */}
-        <div className="mt-6 bg-white/50 rounded-full p-2 backdrop-blur-sm">
-          <div
-            className="h-2 bg-[#7494ec] rounded-full transition-all duration-500 ease-in-out"
-            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-          ></div>
         </div>
       </div>
 

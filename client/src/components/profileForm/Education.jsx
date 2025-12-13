@@ -129,9 +129,6 @@ const Education = () => {
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Leave empty if currently studying
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
