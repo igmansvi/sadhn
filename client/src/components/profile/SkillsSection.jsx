@@ -1,106 +1,83 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState } from 'react';
 import { Edit2, Trash2, Plus } from 'lucide-react';
-import { Dialog, Transition } from '@headlessui/react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog';
 
 const SkillModal = ({ isOpen, onClose, onSave, title, formData, setFormData }) => (
-  <Transition appear show={isOpen} as={Fragment}>
-    <Dialog as="div" className="relative z-50" onClose={onClose}>
-      <Transition.Child
-        as={Fragment}
-        enter="ease-out duration-300"
-        enterFrom="opacity-0"
-        enterTo="opacity-100"
-        leave="ease-in duration-200"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-0"
-      >
-        <div className="fixed inset-0 bg-black bg-opacity-30" />
-      </Transition.Child>
+  <Dialog open={isOpen} onOpenChange={onClose}>
+    <DialogContent className="max-w-md">
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
+      </DialogHeader>
 
-      <div className="fixed inset-0 overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4">
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Skill Name</label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="e.g., React"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
+          <select
+            value={formData.level}
+            onChange={(e) => setFormData({ ...formData, level: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
-              <Dialog.Title className="text-xl font-semibold text-gray-900 mb-4">
-                {title}
-              </Dialog.Title>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Skill Name</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., React"
-                  />
-                </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+          <input
+            type="number"
+            min="0"
+            step="0.5"
+            value={formData.yearsOfExperience}
+            onChange={(e) => setFormData({ ...formData, yearsOfExperience: parseFloat(e.target.value) })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
-                  <select
-                    value={formData.level}
-                    onChange={(e) => setFormData({ ...formData, level: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    value={formData.yearsOfExperience}
-                    onChange={(e) => setFormData({ ...formData, yearsOfExperience: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Used</label>
-                  <input
-                    type="date"
-                    value={formData.lastUsed}
-                    onChange={(e) => setFormData({ ...formData, lastUsed: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3 justify-end mt-6">
-                <button
-                  onClick={onClose}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={onSave}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Save
-                </button>
-              </div>
-            </Dialog.Panel>
-          </Transition.Child>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Last Used</label>
+          <input
+            type="date"
+            value={formData.lastUsed}
+            onChange={(e) => setFormData({ ...formData, lastUsed: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
       </div>
-    </Dialog>
-  </Transition>
+
+      <div className="flex gap-3 justify-end mt-6">
+        <button
+          onClick={onClose}
+          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={onSave}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Save
+        </button>
+      </div>
+    </DialogContent>
+  </Dialog>
 );
 
 const SkillsSection = ({ profile, updateSkill, deleteSkill, addSkill }) => {
@@ -170,7 +147,7 @@ const SkillsSection = ({ profile, updateSkill, deleteSkill, addSkill }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">Skills</h2>
-        <button 
+        <button
           onClick={handleAdd}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
         >
@@ -190,13 +167,13 @@ const SkillsSection = ({ profile, updateSkill, deleteSkill, addSkill }) => {
                 </span>
               </div>
               <div className="flex gap-1.5">
-                <button 
+                <button
                   onClick={() => handleEdit(index)}
                   className="text-blue-600 hover:text-blue-700 p-1 hover:bg-blue-50 rounded transition-colors"
                 >
                   <Edit2 size={14} />
                 </button>
-                <button 
+                <button
                   onClick={() => handleDelete(index)}
                   className="text-red-600 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors"
                 >

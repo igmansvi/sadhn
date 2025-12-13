@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { MapPin, Calendar, DollarSign, Edit2, X, Plus } from 'lucide-react';
-import { Switch, Dialog } from '@headlessui/react';
+import { Switch } from '../ui/switch';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog';
 
 const JobPreferencesSection = ({ profile, updatePreferences }) => {
   const [salaryRange, setSalaryRange] = useState([
@@ -36,7 +42,7 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
 
   const handleSalaryChange = (e, type) => {
     const value = parseInt(e.target.value);
-    const newRange = type === 'min' 
+    const newRange = type === 'min'
       ? [value, salaryRange[1]]
       : [salaryRange[0], value];
     setSalaryRange(newRange);
@@ -75,7 +81,7 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">Job Preferences</h2>
-        <button 
+        <button
           onClick={() => setIsEditing(!isEditing)}
           className="flex items-center gap-1.5 px-3 py-1.5 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm"
         >
@@ -130,7 +136,7 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
           <DollarSign size={16} className="text-gray-600" />
           <h3 className="text-sm font-semibold text-gray-900">Expected Salary (INR)</h3>
         </div>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">Range:</span>
@@ -152,7 +158,7 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
                 disabled={!isEditing}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
                 style={{
-                  background: isEditing ? `linear-gradient(to right, #2563eb 0%, #2563eb ${(salaryRange[0]/100000)*100}%, #e5e7eb ${(salaryRange[0]/100000)*100}%, #e5e7eb 100%)` : '#e5e7eb'
+                  background: isEditing ? `linear-gradient(to right, #2563eb 0%, #2563eb ${(salaryRange[0] / 100000) * 100}%, #e5e7eb ${(salaryRange[0] / 100000) * 100}%, #e5e7eb 100%)` : '#e5e7eb'
                 }}
               />
               <span className="text-xs text-gray-500">₹{salaryRange[0].toLocaleString()}</span>
@@ -170,7 +176,7 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
                 disabled={!isEditing}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
                 style={{
-                  background: isEditing ? `linear-gradient(to right, #2563eb 0%, #2563eb ${(salaryRange[1]/100000)*100}%, #e5e7eb ${(salaryRange[1]/100000)*100}%, #e5e7eb 100%)` : '#e5e7eb'
+                  background: isEditing ? `linear-gradient(to right, #2563eb 0%, #2563eb ${(salaryRange[1] / 100000) * 100}%, #e5e7eb ${(salaryRange[1] / 100000) * 100}%, #e5e7eb 100%)` : '#e5e7eb'
                 }}
               />
               <span className="text-xs text-gray-500">₹{salaryRange[1].toLocaleString()}</span>
@@ -240,103 +246,82 @@ const JobPreferencesSection = ({ profile, updatePreferences }) => {
             </div>
             <Switch
               checked={profile.preferences.willingToRelocate}
-              onChange={handleRelocationToggle}
+              onCheckedChange={handleRelocationToggle}
               disabled={!isEditing}
-              className={`${
-                profile.preferences.willingToRelocate ? 'bg-blue-600' : 'bg-gray-300'
-              } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50`}
-            >
-              <span
-                className={`${
-                  profile.preferences.willingToRelocate ? 'translate-x-6' : 'translate-x-1'
-                } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-              />
-            </Switch>
+            />
           </div>
         </div>
       </div>
 
       {/* Add Location Modal */}
-      <Dialog open={showLocationModal} onClose={() => setShowLocationModal(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-md w-full bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Dialog.Title className="text-lg font-semibold text-gray-900">Add Location</Dialog.Title>
-              <button onClick={() => setShowLocationModal(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={20} />
+      <Dialog open={showLocationModal} onOpenChange={setShowLocationModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Location</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+              <input
+                type="text"
+                value={newLocation}
+                onChange={(e) => setNewLocation(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleAddLocation()}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g., Mumbai, Delhi"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setShowLocationModal(false)}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddLocation}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Add
               </button>
             </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                <input
-                  type="text"
-                  value={newLocation}
-                  onChange={(e) => setNewLocation(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddLocation()}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., Mumbai, Delhi"
-                  autoFocus
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  onClick={() => setShowLocationModal(false)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddLocation}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Add
-                </button>
-              </div>
-            </div>
-          </Dialog.Panel>
-        </div>
+          </div>
+        </DialogContent>
       </Dialog>
 
       {/* Edit Date Modal */}
-      <Dialog open={showDateModal} onClose={() => setShowDateModal(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-md w-full bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Dialog.Title className="text-lg font-semibold text-gray-900">Edit Available From</Dialog.Title>
-              <button onClick={() => setShowDateModal(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={20} />
+      <Dialog open={showDateModal} onOpenChange={setShowDateModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Available From</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <input
+                type="date"
+                value={availableDate}
+                onChange={(e) => setAvailableDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setShowDateModal(false)}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDateSave}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Save
               </button>
             </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                <input
-                  type="date"
-                  value={availableDate}
-                  onChange={(e) => setAvailableDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  onClick={() => setShowDateModal(false)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDateSave}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </Dialog.Panel>
-        </div>
+          </div>
+        </DialogContent>
       </Dialog>
     </div>
   );

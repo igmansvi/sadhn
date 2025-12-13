@@ -18,8 +18,8 @@ const Sidebar = ({ activeSection, scrollToSection, profile }) => {
           <h2 className="text-sm font-semibold text-gray-900 mb-2">Profile Completion</h2>
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-gray-200 rounded-full h-1.5">
-              <div 
-                className="bg-blue-600 h-1.5 rounded-full transition-all duration-300" 
+              <div
+                className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${profile.profileCompletion}%` }}
               />
             </div>
@@ -34,13 +34,12 @@ const Sidebar = ({ activeSection, scrollToSection, profile }) => {
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all text-left ${
-                  activeSection === item.id
+                className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all text-left ${activeSection === item.id
                     ? 'text-blue-600 bg-blue-50 border-l-2 border-blue-600 pl-2.5'
                     : 'text-gray-700 hover:bg-gray-100'
-                }`}
+                  }`}
               >
-                <Icon size={16} className="flex-shrink-0" />
+                <Icon size={16} className="shrink-0" />
                 <span className="text-sm font-medium">{item.label}</span>
               </button>
             );

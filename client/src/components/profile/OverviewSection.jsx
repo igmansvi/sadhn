@@ -32,7 +32,7 @@ const OverviewSection = ({ profile }) => {
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Education</h3>
         {profile.education.map((edu, index) => (
           <div key={index} className="flex gap-3">
-            <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center shrink-0">
               <Award size={20} className="text-gray-600" />
             </div>
             <div>
@@ -109,29 +109,29 @@ const OverviewSection = ({ profile }) => {
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Links</h3>
         <div className="space-y-2">
           {profile.portfolio.website && (
-            <a href={profile.portfolio.website} target="_blank" rel="noopener noreferrer" 
-               className="flex items-center gap-2 text-blue-600 hover:underline text-sm">
+            <a href={profile.portfolio.website} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-600 hover:underline text-sm">
               <Globe size={16} />
               {profile.portfolio.website}
             </a>
           )}
           {profile.portfolio.github && (
-            <a href={profile.portfolio.github} target="_blank" rel="noopener noreferrer" 
-               className="flex items-center gap-2 text-blue-600 hover:underline text-sm">
+            <a href={profile.portfolio.github} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-600 hover:underline text-sm">
               <Github size={16} />
               {profile.portfolio.github}
             </a>
           )}
           {profile.portfolio.linkedin && (
-            <a href={profile.portfolio.linkedin} target="_blank" rel="noopener noreferrer" 
-               className="flex items-center gap-2 text-blue-600 hover:underline text-sm">
+            <a href={profile.portfolio.linkedin} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-600 hover:underline text-sm">
               <Linkedin size={16} />
               {profile.portfolio.linkedin}
             </a>
           )}
           {profile.portfolio.other && profile.portfolio.other.map((link, index) => (
-            <a key={index} href={link} target="_blank" rel="noopener noreferrer" 
-               className="flex items-center gap-2 text-blue-600 hover:underline text-sm">
+            <a key={index} href={link} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-600 hover:underline text-sm">
               <Link2 size={16} />
               {link}
             </a>
@@ -148,9 +148,9 @@ const OverviewSection = ({ profile }) => {
               Uploaded on {formatDate(profile.resume.uploadedAt)}
             </p>
           </div>
-          <a 
-            href={profile.resume.url} 
-            target="_blank" 
+          <a
+            href={profile.resume.url}
+            target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
           >
