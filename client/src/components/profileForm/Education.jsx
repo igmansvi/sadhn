@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -163,7 +161,7 @@ const Education = () => {
 
       {educationList.length > 0 && (
         <div className="mt-8 pt-6 border-t-2 border-[#eee]">
-          <h3 className="text-[22px] font-semibold text-[#7494ec] mb-4">Added Education</h3>
+          <h3 className="text-[22px] font-semibold text-[#7494ec] mb-4">Added Educations</h3>
           <div className="space-y-4">
             {educationList.map((edu, index) => (
               <div

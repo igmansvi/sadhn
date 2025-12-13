@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 import {
   Form,
   FormControl,
@@ -133,7 +132,7 @@ const Certification = () => {
             name="url"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Credential URL</FormLabel>
+                <FormLabel>Certificate URL</FormLabel>
                 <FormControl>
                   <Input 
                     type="url" 
