@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -149,26 +148,32 @@ const Skills = () => {
 
           <div className="space-y-3">
             <FormLabel>Certifications</FormLabel>
-            <div className="flex gap-2">
-              <Input
-                value={certInput}
-                onChange={(e) => setCertInput(e.target.value)}
-                placeholder="Add certification name"
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addCertification();
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={addCertification}
-                className="px-4 py-2 bg-white border-2 border-[#7494ec] text-[#7494ec] rounded-lg hover:bg-[#7494ec] hover:text-white transition-colors font-semibold"
-              >
-                Add
-              </button>
-            </div>
+            <FormControl>
+              <div className="flex gap-2">
+                <Input
+                  value={certInput}
+                  onChange={(e) => setCertInput(e.target.value)}
+                  placeholder="Add certification name"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addCertification();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={addCertification}
+                  className="px-4 bg-white border-2 border-[#7494ec] text-[#7494ec] rounded-lg hover:bg-[#7494ec] hover:text-white transition-colors font-semibold"
+                >
+                  Add
+                </button>
+              </div>
+            </FormControl>
+            <FormDescription>
+              Enter the certifications related to this skill
+            </FormDescription>
+
             {certifications.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {certifications.map((cert, index) => (
@@ -201,7 +206,9 @@ const Skills = () => {
 
       {skills.length > 0 && (
         <div className="mt-8 pt-6 border-t-2 border-[#eee]">
-          <h3 className="text-[22px] font-semibold text-[#7494ec] mb-4">Added Skills</h3>
+          <h3 className="text-[22px] font-semibold text-[#7494ec] mb-4">
+            Added Skills
+          </h3>
           <div className="space-y-4">
             {skills.map((skill, index) => (
               <div
