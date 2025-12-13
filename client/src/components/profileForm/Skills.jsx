@@ -256,6 +256,11 @@ const Skills = () => {
           </div>
         </div>
       )}
+
+      <div className="flex justify-between">
+        <Button className="w-40">Prev</Button>
+        <Button className="w-40">Next</Button>
+      </div>
     </div>
   );
 };
