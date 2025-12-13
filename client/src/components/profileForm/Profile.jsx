@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 import {
   Form,
   FormControl,
@@ -203,7 +202,7 @@ const Profile = () => {
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
                     <Input 
-                      type="tel" 
+                      type="string" 
                       placeholder="+91 1234567890" 
                       {...field} 
                     />
@@ -536,8 +535,6 @@ const Profile = () => {
                           >
                             <option value="INR">INR</option>
                             <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                            <option value="GBP">GBP</option>
                           </select>
                         </FormControl>
                         <FormMessage />
