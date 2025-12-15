@@ -1,5 +1,6 @@
 import React from "react";
 import Start from "./Start.jsx";
+import JobOpportunities from "./JobOpportunities.jsx";
 import Highlights from "./Highlights.jsx";
 import PopularCategories from "./PopularCategories.jsx";
 import FeaturedPrograms from "./FeaturedPrograms.jsx";
@@ -12,6 +13,7 @@ const HeroSection = () => {
   return (
     <div className="relative px-12 pt-20">
       <Start />
+      <JobOpportunities />
       <Highlights />
       <PopularCategories />
       <FeaturedPrograms />

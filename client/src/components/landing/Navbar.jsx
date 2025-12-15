@@ -1,68 +1,62 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
+import { Code2 } from "lucide-react";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   return (
-    <nav className="flex items-center justify-between px-12 py-6 bg-white/80 backdrop-blur-sm">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full"></div>
-        <span className="text-xl font-semibold text-gray-900">Saadhan</span>
+    <nav className="sticky top-0 z-50 flex items-center justify-between px-8 lg:px-12 py-4 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
+          <Code2 className="w-6 h-6 text-white" />
+        </div>
+        <span className="text-xl font-bold text-gray-900">Saadhan</span>
       </div>
 
-      <div className="flex items-center gap-8 text-sm">
+      <div className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium">
         <a
-          href="#highlights"
-          className="text-gray-700 hover:text-gray-900 transition-colors"
+          href="#features"
+          className="text-gray-600 hover:text-gray-900 transition-colors"
         >
-          Highlights
+          Features
         </a>
         <a
           href="#skills"
-          className="text-gray-700 hover:text-gray-900 transition-colors"
+          className="text-gray-600 hover:text-gray-900 transition-colors"
         >
-          Skills
+          Tech Skills
         </a>
         <a
-          href="#courses"
-          className="text-gray-700 hover:text-gray-900 transition-colors"
+          href="#programs"
+          className="text-gray-600 hover:text-gray-900 transition-colors"
         >
-          Courses
+          Programs
         </a>
         <a
-          href="#working"
-          className="text-gray-700 hover:text-gray-900 transition-colors"
+          href="#how-it-works"
+          className="text-gray-600 hover:text-gray-900 transition-colors"
         >
-          Working
+          How It Works
         </a>
         <a
-          href="#parteners"
-          className="text-gray-700 hover:text-gray-900 transition-colors"
+          href="#employers"
+          className="text-gray-600 hover:text-gray-900 transition-colors"
         >
-          Parteners
+          Employers
         </a>
         <a
-          href="#stories"
-          className="text-gray-700 hover:text-gray-900 transition-colors"
+          href="#success-stories"
+          className="text-gray-600 hover:text-gray-900 transition-colors"
         >
-          Stories
-        </a>
-        <a
-          href="#about"
-          className="text-gray-700 hover:text-gray-900 transition-colors"
-        >
-          About
-        </a>
-        <a
-          href="#contact"
-          className="text-gray-700 hover:text-gray-900 transition-colors"
-        >
-          Contact us
+          Success Stories
         </a>
       </div>
 
       <div className="flex items-center gap-4">
-        <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-lg px-6">
-          LogIn / SignUp
+        <Button onClick={() => navigate('/login')} className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-2 shadow-sm">
+          Sign In
         </Button>
       </div>
     </nav>
