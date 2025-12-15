@@ -1,16 +1,14 @@
 import React from "react";
-import LandingPage from "./pages/LandingPage.jsx";
-import Explore from "./pages/Explore.jsx";
-import Profile from "./pages/Profile.jsx";
+import AuthRoutes from "./routes/AuthRoutes";
+import Explore from "./pages/Explore";
+import Profile from "./pages/Profile";
 
 const App = () => {
-  return (
-    <div>
-      {/* <LandingPage /> */}
-      <Explore />
-      {/* <Profile /> */}
-    </div>
-  );
+  return( 
+  // <Explore />
+  // <Profile/>
+  <AuthRoutes />
+  )
 };
 
 export default App;
