@@ -1,64 +1,71 @@
 import React from "react";
 import { Button } from "../ui/button";
+import { Code2, Binary, Server, Palette, BadgeCheck, ArrowRight } from "lucide-react";
 
 const FeaturedPrograms = () => {
   const programs = [
     {
-      icon: "💻",
-      title: "Full Stack Web Development (Govt Certified)",
-      highlights: "Build projects, learn MERN stack, get placement support.",
-      gradient: "from-cyan-100 to-blue-100",
-      badge: "Government Certified",
-    },
-    {
-      icon: "🤖",
-      title: "AI & Data Analytics Bootcamp",
-      highlights: "Hands-on ML, dashboards, analytics toolkit.",
-      gradient: "from-purple-100 to-pink-100",
+      Icon: Code2,
+      title: "Full Stack Web Development",
+      highlights: "Build end-to-end web applications with MERN stack and qualify for versatile developer roles.",
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
       badge: "Most Popular",
+      badgeBg: "bg-blue-600",
     },
     {
-      icon: "⚡",
-      title: "Electrician Training – PMKVY",
-      highlights: "Practical training with sector-certified assessments.",
-      gradient: "from-yellow-100 to-orange-100",
-      badge: "PMKVY Certified",
+      Icon: Binary,
+      title: "Data Structures & Algorithms",
+      highlights: "Strengthen problem-solving abilities essential for technical assessments and engineering roles.",
+      iconBg: "bg-green-100",
+      iconColor: "text-green-600",
+      badge: "Core Skill",
+      badgeBg: "bg-green-600",
     },
     {
-      icon: "🛒",
-      title: "Retail & Customer Service Essentials",
-      highlights: "Job-ready communication & sales training.",
-      gradient: "from-green-100 to-teal-100",
-      badge: "Quick Start",
+      Icon: Server,
+      title: "Backend Development",
+      highlights: "Develop scalable server systems and APIs required for backend and full stack positions.",
+      iconBg: "bg-purple-100",
+      iconColor: "text-purple-600",
+      badge: "High Demand",
+      badgeBg: "bg-purple-600",
+    },
+    {
+      Icon: Palette,
+      title: "Frontend Development",
+      highlights: "Master modern UI frameworks and responsive design for frontend engineering opportunities.",
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-600",
+      badge: "In Demand",
+      badgeBg: "bg-orange-600",
     },
   ];
 
   return (
-    <div className="relative px-12 py-20 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div id="programs" className="relative px-6 lg:px-12 py-16 lg:py-24 bg-white">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <span className="text-3xl">🎯</span>
-            <h2 className="text-4xl font-bold text-gray-900">
-              Featured Programs & Courses
-            </h2>
-          </div>
+        <div className="text-center mb-16">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            Career-Focused Programs
+          </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Industry-aligned training programs designed to make you job-ready
+            Structured learning paths that strengthen your profile and expand career opportunities
           </p>
         </div>
 
         {/* Programs Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-12">
           {programs.map((program, index) => (
             <div
               key={index}
-              className={`bg-gradient-to-br ${program.gradient} rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden`}
+              className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-lg transition-all duration-300 hover:border-gray-300 relative"
             >
               {/* Badge */}
               <div className="absolute top-4 right-4">
-                <span className="bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                <span className={`${program.badgeBg} text-white text-xs font-semibold px-3 py-1.5 rounded-full inline-flex items-center gap-1.5`}>
+                  <BadgeCheck className="w-3.5 h-3.5" />
                   {program.badge}
                 </span>
               </div>
@@ -66,13 +73,13 @@ const FeaturedPrograms = () => {
               <div className="flex items-start gap-6">
                 {/* Icon */}
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 bg-white rounded-xl shadow-md flex items-center justify-center text-4xl">
-                    {program.icon}
+                  <div className={`w-14 h-14 ${program.iconBg} rounded-xl flex items-center justify-center`}>
+                    <program.Icon className={`w-7 h-7 ${program.iconColor}`} />
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 mt-2">
+                <div className="flex-1 mt-1">
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">
                     {program.title}
                   </h3>
@@ -81,21 +88,9 @@ const FeaturedPrograms = () => {
                   </p>
 
                   {/* Learn More Link */}
-                  <button className="text-sm font-semibold text-gray-900 hover:text-orange-600 transition-colors inline-flex items-center group">
+                  <button className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center group">
                     Learn More
-                    <svg
-                      className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                    <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
               </div>
@@ -108,22 +103,10 @@ const FeaturedPrograms = () => {
           <Button
             variant="default"
             size="lg"
-            className="bg-gradient-to-r from-orange-500 to-cyan-500 hover:from-orange-600 hover:to-cyan-600 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-base rounded-xl shadow-md transition-all inline-flex items-center gap-2"
           >
             View All Programs
-            <svg
-              className="w-5 h-5 ml-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
+            <ArrowRight className="w-5 h-5" />
           </Button>
         </div>
       </div>

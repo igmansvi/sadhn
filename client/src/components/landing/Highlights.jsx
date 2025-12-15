@@ -1,63 +1,67 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
+import { Briefcase, Users, Target, Shield, ArrowRight } from "lucide-react";
 
 const Highlights = () => {
   const highlights = [
     {
-      icon: "📈",
-      heading: "10+ Million Learners Trained",
+      Icon: Briefcase,
+      heading: "Skill-Powered Job Matching",
       subtext:
-        "Empowering individuals across India with industry-ready skills.",
-      gradient: "from-orange-100 to-orange-50",
+        "Get matched with opportunities based on your verified skills, projects, and experience level.",
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
     },
     {
-      icon: "🏢",
-      heading: "500+ Hiring Partners",
+      Icon: Users,
+      heading: "Career Growth Programs",
       subtext:
-        "Connect with verified companies actively seeking skilled talent.",
-      gradient: "from-cyan-100 to-cyan-50",
+        "Access industry-aligned courses that strengthen your profile and increase hiring potential.",
+      iconBg: "bg-indigo-100",
+      iconColor: "text-indigo-600",
     },
     {
-      icon: "🎓",
-      heading: "1000+ Certified Programs",
-      subtext: "Government-recognized and industry-aligned training options.",
-      gradient: "from-blue-100 to-blue-50",
+      Icon: Target,
+      heading: "Continuous Skill Development",
+      subtext: "Stay relevant with programs designed around current tech stacks and employer demand.",
+      iconBg: "bg-purple-100",
+      iconColor: "text-purple-600",
     },
     {
-      icon: "⚙️",
-      heading: "Skill Development Across 20+ Domains",
-      subtext: "IT, Manufacturing, Healthcare, Retail, Design, and more.",
-      gradient: "from-purple-100 to-purple-50",
+      Icon: Shield,
+      heading: "Verified Professional Profiles",
+      subtext: "Showcase validated skills and projects that build employer trust and unlock better roles.",
+      iconBg: "bg-cyan-100",
+      iconColor: "text-cyan-600",
     },
   ];
 
   return (
-    <div className="relative px-12 py-20 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div id="features" className="relative px-6 lg:px-12 py-16 lg:py-24 bg-gray-50">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Why Choose Skill India?
+        <div className="text-center mb-16">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            Why Saadhan?
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Join millions of learners transforming their careers with
-            industry-recognized skills and certifications
+            A platform where skills and opportunities work together to accelerate your tech career
           </p>
         </div>
 
         {/* Highlights Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-12">
           {highlights.map((item, index) => (
             <div
               key={index}
-              className={`bg-gradient-to-br ${item.gradient} rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:scale-105`}
+              className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-lg transition-all duration-300 hover:border-gray-300"
             >
               <div className="flex items-start gap-6">
                 {/* Icon */}
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 bg-white rounded-xl shadow-md flex items-center justify-center text-4xl">
-                    {item.icon}
+                <div className="shrink-0">
+                  <div className={`w-14 h-14 ${item.iconBg} rounded-xl flex items-center justify-center`}>
+                    <item.Icon className={`w-7 h-7 ${item.iconColor}`} />
                   </div>
                 </div>
 
@@ -75,27 +79,15 @@ const Highlights = () => {
           ))}
         </div>
 
-        {/* Read More Button */}
+        {/* Learn More Button */}
         <div className="flex justify-center">
           <Button
-            variant="default"
+            variant="outline"
             size="lg"
-            className="bg-gradient-to-r from-orange-500 to-cyan-500 hover:from-orange-600 hover:to-cyan-600 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            className="border-2 border-gray-300 hover:border-gray-400 bg-white text-gray-900 px-8 py-6 text-base rounded-xl transition-all inline-flex items-center gap-2"
           >
-            Read More About Our Impact
-            <svg
-              className="w-5 h-5 ml-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
+            Learn More About the Platform
+            <ArrowRight className="w-5 h-5" />
           </Button>
         </div>
       </div>
