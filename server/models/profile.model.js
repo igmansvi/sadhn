@@ -252,6 +252,12 @@ profileSchema.pre("save", function (next) {
   next();
 });
 
+profileSchema.index({ profileType: 1, isPublic: 1 });
+profileSchema.index({ "skills.name": 1 });
+profileSchema.index({ "location.city": 1, "location.state": 1 });
+profileSchema.index({ profileCompletion: -1 });
+profileSchema.index({ user: 1, profileType: 1 });
+
 const Profile = mongoose.model("Profile", profileSchema);
 
 export default Profile;

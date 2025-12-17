@@ -13,13 +13,24 @@ import { config } from "./config/env.js";
 import connectDB from "./config/db.js";
 import authRouter from "./routes/auth.route.js";
 import profileRouter from "./routes/profile.route.js";
+import jobRouter from "./routes/job.route.js";
+import skillProgramRouter from "./routes/skillprogram.route.js";
+import articleRouter from "./routes/article.route.js";
+import applicationRouter from "./routes/application.route.js";
+import dashboardRouter from "./routes/dashboard.route.js";
+import newsRouter from "./routes/news.route.js";
 import { requestLogger } from "./utils/logger.js";
 
 const app = express();
 
 connectDB();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: config.CLIENT_URL,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
@@ -30,6 +41,12 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/profile", profileRouter);
+app.use("/api/jobs", jobRouter);
+app.use("/api/skill-programs", skillProgramRouter);
+app.use("/api/articles", articleRouter);
+app.use("/api/applications", applicationRouter);
+app.use("/api/dashboard", dashboardRouter);
+app.use("/api/news", newsRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

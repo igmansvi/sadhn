@@ -8,7 +8,7 @@
  */
 
 import Profile from "../models/profile.model.js";
-import User from "../models/User.model.js";
+import User from "../models/user.model.js";
 import { validationResult } from "express-validator";
 
 /**
