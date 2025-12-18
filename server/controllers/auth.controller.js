@@ -1,27 +1,6 @@
-/**
- * Authentication Controller
- *
- * Handles user authentication operations including registration, login,
- * email verification, and password management.
- *
- * @module controllers/auth
- */
-
-import User from "../models/User.model.js";
+import User from "../models/user.model.js";
 import { validationResult } from "express-validator";
 
-/**
- * Register a new user
- *
- * @param {Object} req - Express request object
- * @param {Object} req.body - Request body
- * @param {string} req.body.name - User's name
- * @param {string} req.body.email - User's email
- * @param {string} req.body.password - User's password (min 8 characters)
- * @param {string} [req.body.role] - User's role (learner/employer)
- * @param {Object} res - Express response object
- * @returns {Object} Success response with token and user data
- */
 export const register = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -40,17 +19,49 @@ export const register = async (req, res) => {
 
     const user = await User.create({ name, email, password, role });
 
+    const verificationToken = user.generateVerificationToken();
+    await user.save();
+
+    const { sendEmail } = await import("../utils/email.js");
+    const verificationUrl = `${
+      process.env.CLIENT_URL || "http://localhost:3000"
+    }/verify-email/${verificationToken}`;
+
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: "Verify Your Email - SADHN",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2563eb;">Welcome to SADHN!</h2>
+            <p>Hi ${user.name},</p>
+            <p>Thank you for registering. Please verify your email address by clicking the button below:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${verificationUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Verify Email</a>
+            </div>
+            <p>Or copy and paste this link into your browser:</p>
+            <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
+            <p style="color: #666; font-size: 14px; margin-top: 30px;">This link will expire in 24 hours.</p>
+          </div>
+        `,
+      });
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+    }
+
     const token = user.generateAuthToken();
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message:
+        "User registered successfully. Please check your email to verify your account.",
       token,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        isEmailVerified: user.isVerified,
       },
     });
   } catch (error) {
@@ -60,16 +71,6 @@ export const register = async (req, res) => {
   }
 };
 
-/**
- * Login existing user
- *
- * @param {Object} req - Express request object
- * @param {Object} req.body - Request body
- * @param {string} req.body.email - User's email
- * @param {string} req.body.password - User's password
- * @param {Object} res - Express response object
- * @returns {Object} Success response with token and user data
- */
 export const login = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -110,6 +111,7 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        isEmailVerified: user.isVerified,
       },
     });
   } catch (error) {
@@ -119,15 +121,6 @@ export const login = async (req, res) => {
   }
 };
 
-/**
- * Get authenticated user details
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {string} req.user.id - User's ID
- * @param {Object} res - Express response object
- * @returns {Object} User details
- */
 export const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -144,7 +137,7 @@ export const getUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        isVerified: user.isVerified,
+        isEmailVerified: user.isVerified,
         isActive: user.isActive,
       },
     });
@@ -155,15 +148,6 @@ export const getUser = async (req, res) => {
   }
 };
 
-/**
- * Send email verification link to user
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {string} req.user.id - User's ID
- * @param {Object} res - Express response object
- * @returns {Object} Success message
- */
 export const sendVerificationEmail = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -183,14 +167,26 @@ export const sendVerificationEmail = async (req, res) => {
     await user.save();
 
     const { sendEmail } = await import("../utils/email.js");
-    const verificationUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/api/auth/verify-email/${verificationToken}`;
+    const verificationUrl = `${
+      process.env.CLIENT_URL || "http://localhost:3000"
+    }/verify-email/${verificationToken}`;
 
     await sendEmail({
       to: user.email,
-      subject: "Email Verification",
-      html: `<p>Please verify your email by clicking the link below:</p><a href="${verificationUrl}">Verify Email</a><p>This link expires in 24 hours.</p>`,
+      subject: "Verify Your Email - SADHN",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb;">Verify Your Email</h2>
+          <p>Hi ${user.name},</p>
+          <p>Please verify your email address by clicking the button below:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Verify Email</a>
+          </div>
+          <p>Or copy and paste this link into your browser:</p>
+          <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
+          <p style="color: #666; font-size: 14px; margin-top: 30px;">This link will expire in 24 hours.</p>
+        </div>
+      `,
     });
 
     res.status(200).json({
@@ -204,15 +200,6 @@ export const sendVerificationEmail = async (req, res) => {
   }
 };
 
-/**
- * Verify user email with token
- *
- * @param {Object} req - Express request object
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.token - Verification token
- * @param {Object} res - Express response object
- * @returns {Object} Success message
- */
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
@@ -244,15 +231,6 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
-/**
- * Send password reset link to user
- *
- * @param {Object} req - Express request object
- * @param {Object} req.body - Request body
- * @param {string} req.body.email - User's email
- * @param {Object} res - Express response object
- * @returns {Object} Success message
- */
 export const forgotPassword = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -294,17 +272,6 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-/**
- * Reset user password with token
- *
- * @param {Object} req - Express request object
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.token - Reset password token
- * @param {Object} req.body - Request body
- * @param {string} req.body.password - New password (min 8 characters)
- * @param {Object} res - Express response object
- * @returns {Object} Success message
- */
 export const resetPassword = async (req, res) => {
   try {
     const errors = validationResult(req);

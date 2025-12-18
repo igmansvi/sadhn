@@ -1,12 +1,3 @@
-/**
- * Profile Model
- *
- * Defines profile schema for learners and employers.
- * Includes skills, experience, education, and preferences.
- *
- * @module models/Profile
- */
-
 import mongoose from "mongoose";
 
 const skillSchema = new mongoose.Schema(
@@ -212,11 +203,6 @@ const profileSchema = new mongoose.Schema(
   }
 );
 
-/**
- * Calculate profile completion percentage
- *
- * @returns {number} Completion percentage (0-100)
- */
 profileSchema.methods.calculateCompletion = function () {
   let score = 0;
   const weights = {
@@ -251,6 +237,12 @@ profileSchema.pre("save", function (next) {
   this.profileCompletion = this.calculateCompletion();
   next();
 });
+
+profileSchema.index({ profileType: 1, isPublic: 1 });
+profileSchema.index({ "skills.name": 1 });
+profileSchema.index({ "location.city": 1, "location.state": 1 });
+profileSchema.index({ profileCompletion: -1 });
+profileSchema.index({ user: 1, profileType: 1 });
 
 const Profile = mongoose.model("Profile", profileSchema);
 

@@ -1,11 +1,4 @@
-/**
- * Environment Configuration
- *
- * Loads and exports environment variables from .env file.
- * Provides default values for optional configurations.
- *
- * @module config/env
- */
+
 
 import dotenv from "dotenv";
 import path from "path";
@@ -27,6 +20,8 @@ export const config = {
 
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRE: process.env.JWT_EXPIRE || "7d",
+
+  CLIENT_URL: process.env.CLIENT_URL,
 
   EMAIL_HOST: process.env.EMAIL_HOST,
   EMAIL_PORT: process.env.EMAIL_PORT,

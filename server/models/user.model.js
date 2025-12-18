@@ -1,12 +1,3 @@
-/**
- * User Model
- *
- * Defines the user schema and methods for authentication.
- * Includes password hashing, token generation, and email verification.
- *
- * @module models/User
- */
-
 import { config } from "../config/env.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
@@ -83,12 +74,6 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-/**
- * Compare provided password with hashed password
- *
- * @param {string} userPassword - Plain text password to compare
- * @returns {Promise<boolean>} True if passwords match, false otherwise
- */
 userSchema.methods.comparePassword = async function (userPassword) {
   try {
     return await bcrypt.compare(userPassword, this.password);
@@ -97,11 +82,6 @@ userSchema.methods.comparePassword = async function (userPassword) {
   }
 };
 
-/**
- * Generate JWT authentication token
- *
- * @returns {string} JWT token containing user id, email, and role
- */
 userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     {
@@ -117,11 +97,6 @@ userSchema.methods.generateAuthToken = function () {
   return token;
 };
 
-/**
- * Generate email verification token
- *
- * @returns {string} JWT token for email verification (valid for 24 hours)
- */
 userSchema.methods.generateVerificationToken = function () {
   const token = jwt.sign({ id: this._id }, config.JWT_SECRET, {
     expiresIn: "24h",
@@ -131,11 +106,6 @@ userSchema.methods.generateVerificationToken = function () {
   return token;
 };
 
-/**
- * Generate password reset token
- *
- * @returns {string} JWT token for password reset (valid for 1 hour)
- */
 userSchema.methods.generateResetPasswordToken = function () {
   const token = jwt.sign({ id: this._id }, config.JWT_SECRET, {
     expiresIn: "1h",
@@ -144,6 +114,10 @@ userSchema.methods.generateResetPasswordToken = function () {
   this.resetPasswordExpire = Date.now() + 60 * 60 * 1000;
   return token;
 };
+
+userSchema.index({ role: 1, isActive: 1 });
+userSchema.index({ isVerified: 1, isActive: 1 });
+userSchema.index({ email: 1, isActive: 1 });
 
 const User = mongoose.model("User", userSchema);
 

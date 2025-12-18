@@ -1,0 +1,576 @@
+# Full-Stack Project - Frontend
+
+React + Vite + TailwindCSS + shadcn/ui
+
+## 📋 Project Overview
+
+A professional skill enhancement and job seeking platform with three distinct user roles:
+
+- **Learner**: Browse jobs, apply, manage applications, enroll skill programs
+- **Employer**: Post jobs, manage applications, write articles
+- **Admin**: Manage and create news/announcements, platform administration
+
+## 🎨 Tech Stack
+
+- **Framework**: React 18 + Vite
+- **UI Library**: shadcn/ui (Neutral, Minimal, Professional)
+- **Styling**: TailwindCSS
+- **State Management**: Redux Toolkit
+- **Routing**: React Router v6
+- **Form Handling**: React Hook Form
+- **HTTP Client**: Axios
+- **Icons**: Lucide React
+- **Notifications**: Sonner
+
+## ✅ Features Implemented
+
+### Authentication
+
+- Login with email/password
+- Registration with role selection (Learner/Employer)
+- Forgot password & reset password
+- Email verification
+- Role-based access control
+- Protected routes
+
+### Learner Features
+
+- Dashboard with stats and recommendations
+- Complete profile management (skills, experience, education, certifications)
+- Job browsing with advanced filters (type, experience, location, search)
+- Job details and application submission
+- Application tracking with status tabs
+- Skill programs catalog
+
+### Employer Features
+
+- Dashboard with job statistics and analytics
+- Job management (create, edit, delete, status control)
+- Application management per job
+- Application status updates
+- Article creation and management
+- Company profile management
+
+### Admin Features
+
+- Platform statistics dashboard
+- News/announcements management
+- Skill programs management
+- Priority and category system
+- Active/inactive status control
+
+### Performance Optimizations
+
+- Lazy loading for all routes
+- Code splitting
+- Debounced search inputs (500ms)
+- Pagination for large lists
+- Loading states and skeletons
+- Empty state components
+- CSV export functionality
+
+## 📁 Project Structure
+
+```
+src/
+├── components/
+│   ├── ui/              # shadcn components
+│   |── shared/          # Shared components
+│   ├── auth/            # Authentication components
+│   ├── admin/           # Admin dashboard & features components
+│   ├── employer/        # Employer dashboard & features components
+│   ├── learner/         # Learner dashboard & features components
+├── pages/
+│   ├── auth/            # Authentication pages
+│   ├── admin/           # Admin dashboard & features
+│   ├── employer/        # Employer dashboard & features
+│   ├── learner/         # Learner dashboard & features
+│   └── common/          # Home, About, Contact
+├── lib/
+│   ├── api.js           # Axios configuration
+│   ├── constants.js     # Constants & enums
+│   └── services/        # API service functions
+│       ├── authService.js
+│       ├── jobService.js
+│       ├── profileService.js
+│       ├── applicationService.js
+│       ├── articleService.js
+│       ├── newsService.js
+│       ├── skillProgramService.js
+│       └── dashboardService.js
+├── store/
+│   ├── index.js         # Redux store
+│   └── slices
+├── hooks
+├── layouts
+└── routes
+```
+
+## � API Services
+
+All API interactions are handled through service modules in `lib/services/`:
+
+- **authService.js** - Login, register, forgot password, verify email
+- **jobService.js** - Create, read, update, delete jobs; filter and search
+- **profileService.js** - Get and update user profiles
+- **applicationService.js** - Submit and track job applications
+- **articleService.js** - Employer articles management
+- **newsService.js** - Admin news and announcements
+- **skillProgramService.js** - Skill programs catalog
+
+Each service uses the configured Axios instance (`lib/api.js`) with automatic token injection and 401 handling.
+
+export const jobService = {
+// Get all jobs with filters
+getAllJobs: async (filters = {}) => {
+const response = await api.get("/jobs", { params: filters });
+return response.data;
+},
+
+// Get single job
+getJobById: async (id) => {
+const response = await api.get(`/jobs/${id}`);
+return response.data;
+},
+
+// Create new job (employer only)
+createJob: async (jobData) => {
+const response = await api.post("/jobs", jobData);
+return response.data;
+},
+
+// Update job
+updateJob: async (id, jobData) => {
+const response = await api.patch(`/jobs/${id}`, jobData);
+return response.data;
+},
+
+// Delete job
+deleteJob: async (id) => {
+const response = await api.delete(`/jobs/${id}`);
+return response.data;
+},
+
+// Search jobs
+searchJobs: async (searchParams) => {
+const response = await api.get("/jobs/search", { params: searchParams });
+return response.data;
+},
+
+// Get my jobs (employer)
+getMyJobs: async (filters = {}) => {
+const response = await api.get("/jobs/my-jobs", { params: filters });
+return response.data;
+},
+};
+
+````
+
+**Usage in Component**
+
+```jsx
+import { useState, useEffect } from "react";
+import { jobService } from "@/lib/services/jobService";
+
+function JobsList() {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        const data = await jobService.getAllJobs();
+        setJobs(data.data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch jobs");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div>
+      {jobs.map((job) => (
+        <JobCard key={job._id} job={job} />
+      ))}
+    </div>
+  );
+}
+````
+
+### Service Modules to Create
+
+All service files in `lib/services/`:
+
+- `authService.js` - Register, login, verify email, reset password
+- `profileService.js` - CRUD profile, skills, experience, education
+- `jobService.js` - CRUD jobs, search, filters
+- `applicationService.js` - Apply, withdraw, update status
+- `articleService.js` - CRUD articles, publish
+- `newsService.js` - CRUD news/announcements
+- `skillProgramService.js` - Browse skill programs
+- `dashboardService.js` - Get dashboard data
+
+### API Endpoints Reference
+
+All endpoints tested and documented via backend tests (175 passing tests):
+
+**Auth**: `/api/auth/*`
+**Profile**: `/api/profile/*`
+**Jobs**: `/api/jobs/*`
+**Applications**: `/api/applications/*`
+**Articles**: `/api/articles/*`
+**News**: `/api/news/*`
+**Skill Programs**: `/api/skill-programs/*`
+**Dashboard**: `/api/dashboard/*`
+
+---
+
+## 📦 State Management Strategy
+
+**Redux Toolkit (RTK)**
+
+**store/index.js - Store Configuration**
+
+```javascript
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "./slices/authSlice";
+import profileReducer from "./slices/profileSlice";
+import jobReducer from "./slices/jobSlice";
+
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    profile: profileReducer,
+    job: jobReducer,
+  },
+});
+```
+
+**store/slices/authSlice.js - Example Slice**
+
+```javascript
+import { createSlice } from "@reduxjs/toolkit";
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState: {
+    user: null,
+    token: localStorage.getItem("token"),
+    isAuthenticated: false,
+    loading: false,
+  },
+  reducers: {
+    setCredentials: (state, action) => {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.isAuthenticated = true;
+      localStorage.setItem("token", action.payload.token);
+    },
+    logout: (state) => {
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      localStorage.removeItem("token");
+    },
+  },
+});
+
+export const { setCredentials, logout } = authSlice.actions;
+export default authSlice.reducer;
+```
+
+**Usage in Component**
+
+```jsx
+import { useDispatch, useSelector } from "react-redux";
+import { setCredentials } from "@/store/slices/authSlice";
+import { authService } from "@/lib/services/authService";
+
+function LoginPage() {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.auth);
+
+  const handleLogin = async (credentials) => {
+    try {
+      const data = await authService.login(credentials);
+      dispatch(
+        setCredentials({
+          user: data.user,
+          token: data.token,
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return <LoginForm onSubmit={handleLogin} />;
+}
+```
+
+**Redux Slices to Create**:
+
+- `authSlice.js` - Authentication state, user, token
+- `profileSlice.js` - User profile data
+- `jobSlice.js` - Jobs listing, filters, pagination
+- `applicationSlice.js` - Applications data (optional)
+
+**Data Fetching Pattern**:
+
+- ✅ Service functions handle API calls
+- ✅ Components use useState/useEffect for local data
+- ✅ Redux for global state (auth, user profile)
+- ✅ Local state for page-specific data (lists, forms)
+
+---
+
+## 🎨 Design Tokens
+
+### Colors (TailwindCSS + shadcn)
+
+- Primary: Blue (Jobs, CTAs)
+- Secondary: Purple (Articles, Content)
+- Success: Green (Approved, Active)
+- Warning: Yellow (Pending, Review)
+- Danger: Red (Rejected, Delete)
+- Neutral: Gray (Text, Borders)
+
+### Typography
+
+- Headings: font-bold, font-semibold
+- Body: font-normal
+- Small: text-sm
+- Muted: text-muted-foreground
+
+---
+
+## 🧪 Testing Strategy
+
+**Manual Testing Only** (Backend fully tested with 175 tests)
+
+- Click through all features
+- Test form validations
+- Check API error handling
+- Verify role-based access
+- Test on different screen sizes
+- Cross-browser compatibility
+
+---
+
+## 📝 Development Guidelines
+
+1. **Component Structure**: Functional components with hooks
+2. **Naming**: PascalCase for components, camelCase for functions
+3. **File Organization**: One component per file
+4. **Props**: Use destructuring, add prop validation if needed
+5. **API Calls**: Use React Query hooks, handle loading/error states
+6. **Forms**: Use react-hook-form for validation
+7. **Styling**: TailwindCSS utility classes, shadcn components
+8. **Comments**: Only for complex logic, code should be self-documenting
+
+---
+
+## � Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- Backend server running on `http://localhost:5000`
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env
+```
+
+### Environment Variables
+
+Create a `.env` file:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+### Development
+
+```bash
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+The application will run on `http://localhost:3000`
+
+## 📦 Installed Packages
+
+### Core Dependencies
+
+- `react` - UI library
+- `react-dom` - React DOM rendering
+- `react-router-dom` - Routing
+- `@reduxjs/toolkit` - State management
+- `react-redux` - Redux React bindings
+- `axios` - HTTP client
+- `react-hook-form` - Form handling
+
+### UI & Styling
+
+- `tailwindcss` - Utility-first CSS
+- `@radix-ui/*` - Accessible UI primitives (via shadcn)
+- `lucide-react` - Icon library
+- `sonner` - Toast notifications
+- `class-variance-authority` - Component variants
+- `tailwind-merge` - Tailwind class merging
+- `clsx` - Conditional classes
+
+### Dev Dependencies
+
+- `vite` - Build tool
+- `@vitejs/plugin-react` - React plugin for Vite
+- `eslint` - Code linting
+- `autoprefixer` - CSS prefix automation
+- `postcss` - CSS transformation
+
+## 🎯 Key Features
+
+### Error Handling
+
+- Axios interceptors for global error handling
+- Toast notifications for user feedback
+- 401 auto-logout and redirect
+- Service layer error handling
+
+### State Management
+
+- Redux Toolkit for global state
+- Auth state (user, token, isAuthenticated)
+- Profile state management
+- Job filters and pagination state
+
+### API Integration
+
+- Service layer architecture
+- Consistent error handling across services
+- Bearer token authentication
+- Request/response interceptors
+
+### UI/UX
+
+- Responsive design (mobile-first)
+- Loading states and skeletons
+- Empty state components
+- Pagination for large datasets
+- Debounced search inputs
+- CSV export functionality
+- Toast notifications
+- Consistent color scheme (neutral theme)
+
+## 📝 Development Guidelines
+
+### Code Style
+
+- Functional components with hooks
+- PascalCase for components
+- camelCase for functions and variables
+- Destructure props
+- Use named exports for utilities
+
+### Component Structure
+
+```jsx
+import statements
+
+export default function ComponentName() {
+  const [state, setState] = useState();
+
+  useEffect(() => {
+    // effects
+  }, []);
+
+  const handleAction = () => {
+    // handlers
+  };
+
+  return (
+    // JSX
+  );
+}
+```
+
+### API Service Pattern
+
+```javascript
+export const serviceName = {
+  method: async (params) => {
+    try {
+      const response = await api.post("/endpoint", params);
+      toast.success("Success message");
+      return response.data;
+    } catch (error) {
+      const message = error.response?.data?.message || "Error message";
+      toast.error(message);
+      throw error;
+    }
+  },
+};
+```
+
+## 📈 Project Status
+
+**Status**: ✅ Complete
+
+### Completed Phases
+
+- ✅ Phase 1: Setup & Foundation
+- ✅ Phase 2: Authentication & Common Pages
+- ✅ Phase 3: Learner Features
+- ✅ Phase 4: Employer Features
+- ✅ Phase 5: Admin Features
+- ✅ Phase 6: Polish & Optimization
+
+### Features Checklist
+
+- ✅ Authentication system (login, register, password reset, email verification)
+- ✅ Role-based access control (learner, employer, admin)
+- ✅ Learner dashboard and profile management
+- ✅ Job browsing with filters and search
+- ✅ Application submission and tracking
+- ✅ Employer job management
+- ✅ Application management for employers
+- ✅ Article creation and management
+- ✅ Admin news management
+- ✅ Skill programs management
+- ✅ Lazy loading and code splitting
+- ✅ Pagination and search optimization
+- ✅ Export functionality
+
+## 🔗 Related
+
+- Backend API: `../server/README.md`
+- API Documentation: See backend README for endpoints
+
+## 🤝 Contributing
+
+1. Follow the established code style
+2. Keep components focused and reusable
+3. Add proper error handling
+4. Test on multiple screen sizes
+5. Ensure accessibility standards

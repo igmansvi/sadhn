@@ -1,25 +1,8 @@
-/**
- * Profile Controller
- *
- * Handles profile operations including CRUD, skills, experience,
- * education, certifications, and resume management.
- *
- * @module controllers/profile
- */
-
 import Profile from "../models/profile.model.js";
-import User from "../models/User.model.js";
+import User from "../models/user.model.js";
+import { syncProfileSummary } from "./matching.controller.js";
 import { validationResult } from "express-validator";
 
-/**
- * Create new profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.body - Profile data
- * @param {Object} res - Express response object
- * @returns {Object} Created profile
- */
 export const createProfile = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -47,6 +30,8 @@ export const createProfile = async (req, res) => {
       ...req.body,
     });
 
+    await syncProfileSummary(req.user.id);
+
     res.status(201).json({
       success: true,
       message: "Profile created successfully",
@@ -59,25 +44,64 @@ export const createProfile = async (req, res) => {
   }
 };
 
-/**
- * Get authenticated user's profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} res - Express response object
- * @returns {Object} User profile
- */
+export const checkProfileExists = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    if (user.role !== "learner") {
+      return res.status(200).json({
+        success: true,
+        exists: true,
+        required: false,
+      });
+    }
+
+    const profile = await Profile.findOne({ user: req.user.id });
+    res.status(200).json({
+      success: true,
+      exists: !!profile,
+      required: true,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
 export const getMyProfile = async (req, res) => {
   try {
-    const profile = await Profile.findOne({ user: req.user.id }).populate(
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    let profile = await Profile.findOne({ user: req.user.id }).populate(
       "user",
       "name email role"
     );
 
     if (!profile) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Profile not found" });
+      if (user.role === "learner") {
+        return res
+          .status(404)
+          .json({ success: false, message: "Profile not found" });
+      }
+      profile = await Profile.create({
+        user: req.user.id,
+        profileType: user.role,
+      });
+      profile = await Profile.findById(profile._id).populate(
+        "user",
+        "name email role"
+      );
     }
 
     res.status(200).json({
@@ -91,15 +115,6 @@ export const getMyProfile = async (req, res) => {
   }
 };
 
-/**
- * Get profile by user ID
- *
- * @param {Object} req - Express request object
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.userId - User ID
- * @param {Object} res - Express response object
- * @returns {Object} User profile (if public)
- */
 export const getProfileById = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.params.userId }).populate(
@@ -130,15 +145,6 @@ export const getProfileById = async (req, res) => {
   }
 };
 
-/**
- * Update profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.body - Updated profile data
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const updateProfile = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -172,6 +178,7 @@ export const updateProfile = async (req, res) => {
     });
 
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -185,14 +192,6 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-/**
- * Delete profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} res - Express response object
- * @returns {Object} Success message
- */
 export const deleteProfile = async (req, res) => {
   try {
     const profile = await Profile.findOneAndDelete({ user: req.user.id });
@@ -214,14 +213,6 @@ export const deleteProfile = async (req, res) => {
   }
 };
 
-/**
- * Search profiles
- *
- * @param {Object} req - Express request object
- * @param {Object} req.query - Query parameters
- * @param {Object} res - Express response object
- * @returns {Object} Array of matching profiles
- */
 export const searchProfiles = async (req, res) => {
   try {
     const {
@@ -277,15 +268,6 @@ export const searchProfiles = async (req, res) => {
   }
 };
 
-/**
- * Add skill to profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.body - Skill data
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const addSkill = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -302,6 +284,7 @@ export const addSkill = async (req, res) => {
 
     profile.skills.push(req.body);
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -315,17 +298,6 @@ export const addSkill = async (req, res) => {
   }
 };
 
-/**
- * Update skill in profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.index - Skill index
- * @param {Object} req.body - Updated skill data
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const updateSkill = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -349,6 +321,7 @@ export const updateSkill = async (req, res) => {
 
     Object.assign(profile.skills[index], req.body);
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -362,16 +335,6 @@ export const updateSkill = async (req, res) => {
   }
 };
 
-/**
- * Remove skill from profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.index - Skill index
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const removeSkill = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
@@ -390,6 +353,7 @@ export const removeSkill = async (req, res) => {
 
     profile.skills.splice(index, 1);
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -403,15 +367,6 @@ export const removeSkill = async (req, res) => {
   }
 };
 
-/**
- * Add experience to profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.body - Experience data
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const addExperience = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -428,6 +383,7 @@ export const addExperience = async (req, res) => {
 
     profile.experience.push(req.body);
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -441,17 +397,6 @@ export const addExperience = async (req, res) => {
   }
 };
 
-/**
- * Update experience in profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.index - Experience index
- * @param {Object} req.body - Updated experience data
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const updateExperience = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -475,6 +420,7 @@ export const updateExperience = async (req, res) => {
 
     Object.assign(profile.experience[index], req.body);
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -488,16 +434,6 @@ export const updateExperience = async (req, res) => {
   }
 };
 
-/**
- * Remove experience from profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.index - Experience index
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const removeExperience = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
@@ -516,6 +452,7 @@ export const removeExperience = async (req, res) => {
 
     profile.experience.splice(index, 1);
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -529,15 +466,6 @@ export const removeExperience = async (req, res) => {
   }
 };
 
-/**
- * Add education to profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.body - Education data
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const addEducation = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -554,6 +482,7 @@ export const addEducation = async (req, res) => {
 
     profile.education.push(req.body);
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -567,17 +496,6 @@ export const addEducation = async (req, res) => {
   }
 };
 
-/**
- * Update education in profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.index - Education index
- * @param {Object} req.body - Updated education data
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const updateEducation = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -601,6 +519,7 @@ export const updateEducation = async (req, res) => {
 
     Object.assign(profile.education[index], req.body);
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -614,16 +533,6 @@ export const updateEducation = async (req, res) => {
   }
 };
 
-/**
- * Remove education from profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.index - Education index
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const removeEducation = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
@@ -642,6 +551,7 @@ export const removeEducation = async (req, res) => {
 
     profile.education.splice(index, 1);
     await profile.save();
+    await syncProfileSummary(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -655,15 +565,6 @@ export const removeEducation = async (req, res) => {
   }
 };
 
-/**
- * Add certification to profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.body - Certification data
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const addCertification = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -693,17 +594,6 @@ export const addCertification = async (req, res) => {
   }
 };
 
-/**
- * Update certification in profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.index - Certification index
- * @param {Object} req.body - Updated certification data
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const updateCertification = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -743,16 +633,6 @@ export const updateCertification = async (req, res) => {
   }
 };
 
-/**
- * Remove certification from profile
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} req.params - Request parameters
- * @param {string} req.params.index - Certification index
- * @param {Object} res - Express response object
- * @returns {Object} Updated profile
- */
 export const removeCertification = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
@@ -784,14 +664,6 @@ export const removeCertification = async (req, res) => {
   }
 };
 
-/**
- * Get profile completion status
- *
- * @param {Object} req - Express request object
- * @param {Object} req.user - Authenticated user from middleware
- * @param {Object} res - Express response object
- * @returns {Object} Profile completion details
- */
 export const getProfileCompletion = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });

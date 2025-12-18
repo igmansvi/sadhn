@@ -1,21 +1,4 @@
-/**
- * Profile Routes
- *
- * Defines API endpoints for profile operations:
- * - POST /profile - Create profile
- * - GET /profile/me - Get own profile
- * - GET /profile/search - Search profiles
- * - GET /profile/completion - Get completion status
- * - GET /profile/:userId - Get profile by user ID
- * - PUT /profile - Update profile
- * - DELETE /profile - Delete profile
- * - POST/PUT/DELETE /profile/skills - Manage skills
- * - POST/PUT/DELETE /profile/experience - Manage experience
- * - POST/PUT/DELETE /profile/education - Manage education
- * - POST/PUT/DELETE /profile/certifications - Manage certifications
- *
- * @module routes/profile
- */
+
 
 import express from "express";
 import { body } from "express-validator";
@@ -39,6 +22,7 @@ import {
   updateCertification,
   removeCertification,
   getProfileCompletion,
+  checkProfileExists,
 } from "../controllers/profile.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 
@@ -64,6 +48,8 @@ profileRouter.post(
 );
 
 profileRouter.get("/me", authenticate, getMyProfile);
+
+profileRouter.get("/exists", authenticate, checkProfileExists);
 
 profileRouter.get("/search", searchProfiles);
 

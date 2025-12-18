@@ -1,17 +1,4 @@
-/**
- * Authentication Routes
- *
- * Defines API endpoints for user authentication operations:
- * - POST /register - Register new user
- * - POST /login - Login user
- * - GET /getUser - Get authenticated user (protected)
- * - POST /send-verification-email - Send email verification (protected)
- * - GET /verify-email/:token - Verify email with token
- * - POST /forgot-password - Request password reset
- * - POST /reset-password/:token - Reset password with token
- *
- * @module routes/auth
- */
+
 
 import express from "express";
 import { body } from "express-validator";
