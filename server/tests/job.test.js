@@ -42,10 +42,13 @@ describe("Job Routes", () => {
   let testJob;
 
   beforeAll(async () => {
-    await mongoose.connect(config.MONGODB_URI);
+    await mongoose.connect(config.TEST_URI);
   });
 
   afterAll(async () => {
+    await User.deleteMany({});
+    await Job.deleteMany({});
+    await Profile.deleteMany({});
     await mongoose.connection.close();
   });
 

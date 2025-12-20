@@ -41,10 +41,14 @@ describe("Matching Routes", () => {
   let testEmployer;
 
   beforeAll(async () => {
-    await mongoose.connect(config.MONGODB_URI);
+    await mongoose.connect(config.TEST_URI);
   });
 
   afterAll(async () => {
+    await User.deleteMany({});
+    await Profile.deleteMany({});
+    await Job.deleteMany({});
+    await SkillProgram.deleteMany({});
     await mongoose.connection.close();
   });
 

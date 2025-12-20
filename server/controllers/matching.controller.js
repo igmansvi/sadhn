@@ -378,6 +378,8 @@ export const syncProfileSummary = async (userId) => {
     const profile = await Profile.findOne({ user: userId });
     if (!profile) return null;
 
+    if (profile.profileType !== "learner") return null;
+
     const totalExperience = (profile.experience || []).reduce((total, exp) => {
       if (!exp.startDate) return total;
       const start = new Date(exp.startDate);

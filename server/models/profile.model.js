@@ -98,7 +98,7 @@ const profileSchema = new mongoose.Schema(
     },
     profileType: {
       type: String,
-      enum: ["learner", "employer"],
+      enum: ["learner"],
       required: true,
     },
     headline: {

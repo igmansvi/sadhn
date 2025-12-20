@@ -1,10 +1,7 @@
-
-
 import jwt from "jsonwebtoken";
 import { config } from "../config/env.js";
 import User from "../models/user.model.js";
 import Profile from "../models/profile.model.js";
-
 
 export const authenticate = async (req, res, next) => {
   try {
@@ -39,7 +36,6 @@ export const authenticate = async (req, res, next) => {
   }
 };
 
-
 export const requireRole = (roles) => {
   return (req, res, next) => {
     if (!req.user) {
@@ -58,7 +54,6 @@ export const requireRole = (roles) => {
     next();
   };
 };
-
 
 export const requireVerifiedEmail = async (req, res, next) => {
   try {
@@ -83,13 +78,21 @@ export const requireVerifiedEmail = async (req, res, next) => {
   }
 };
 
-
 export const requireProfile = async (req, res, next) => {
   try {
     if (!req.user) {
       return res
         .status(401)
         .json({ success: false, message: "authentication required" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user.isVerified) {
+      return res.status(403).json({
+        success: false,
+        message: "email verification required",
+        action: "verify-email",
+      });
     }
 
     const profile = await Profile.findOne({ user: req.user.id });

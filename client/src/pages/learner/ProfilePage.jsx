@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,10 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { setProfile } from "@/store/slices/profileSlice";
+import { logout } from "@/store/slices/authSlice";
 import { profileService } from "@/lib/services/profileService";
 import { authService } from "@/lib/services/authService";
 import { SKILL_LEVELS } from "@/lib/constants";
@@ -152,6 +155,10 @@ export default function ProfilePage() {
                         <GraduationCap className="h-4 w-4 mr-2" />
                         Education
                     </TabsTrigger>
+                    <TabsTrigger value="account">
+                        <AlertCircle className="h-4 w-4 mr-2" />
+                        Account
+                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="basic">
@@ -265,6 +272,10 @@ export default function ProfilePage() {
 
                 <TabsContent value="education">
                     <EducationSection profile={profile} onUpdate={fetchProfile} />
+                </TabsContent>
+
+                <TabsContent value="account">
+                    <AccountSection />
                 </TabsContent>
             </Tabs>
         </div>
@@ -711,6 +722,81 @@ function EducationSection({ profile, onUpdate }) {
                                 <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save"}</Button>
                             </DialogFooter>
                         </form>
+                    </DialogContent>
+                </Dialog>
+            </CardContent>
+        </Card>
+    );
+}
+
+function AccountSection() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [confirmText, setConfirmText] = useState("");
+
+    const handleDeleteAccount = async () => {
+        if (confirmText !== "DELETE") return;
+        setDeleting(true);
+        try {
+            await authService.deleteAccount();
+            toast.success("Account deleted successfully");
+            dispatch(logout());
+            navigate("/");
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to delete account");
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    return (
+        <Card className="border-destructive/50">
+            <CardHeader>
+                <CardTitle className="text-destructive">Danger Zone</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="p-4 border border-destructive/30 rounded-lg bg-destructive/5">
+                    <h4 className="font-medium text-destructive mb-2">Delete Account</h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                        Once you delete your account, there is no going back. This will permanently delete your profile,
+                        applications, and all associated data.
+                    </p>
+                    <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Account
+                    </Button>
+                </div>
+
+                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle className="text-destructive">Delete Account</DialogTitle>
+                            <DialogDescription>
+                                This action cannot be undone. This will permanently delete your account and remove all your data.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <p className="text-sm">
+                                To confirm, type <span className="font-bold">DELETE</span> below:
+                            </p>
+                            <Input
+                                value={confirmText}
+                                onChange={(e) => setConfirmText(e.target.value)}
+                                placeholder="Type DELETE to confirm"
+                            />
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                            <Button
+                                variant="destructive"
+                                onClick={handleDeleteAccount}
+                                disabled={confirmText !== "DELETE" || deleting}
+                            >
+                                {deleting ? "Deleting..." : "Delete Account"}
+                            </Button>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </CardContent>

@@ -39,10 +39,11 @@ describe("SkillProgram Routes", () => {
   let testProgram;
 
   beforeAll(async () => {
-    await mongoose.connect(config.MONGODB_URI);
+    await mongoose.connect(config.TEST_URI);
   });
 
   afterAll(async () => {
+    await SkillProgram.deleteMany({});
     await mongoose.connection.close();
   });
 

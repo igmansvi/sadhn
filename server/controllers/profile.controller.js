@@ -24,6 +24,13 @@ export const createProfile = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
+    if (user.role !== "learner") {
+      return res.status(403).json({
+        success: false,
+        message: "Only learners can create a profile",
+      });
+    }
+
     const profile = await Profile.create({
       user: req.user.id,
       profileType: user.role,
@@ -89,19 +96,9 @@ export const getMyProfile = async (req, res) => {
     );
 
     if (!profile) {
-      if (user.role === "learner") {
-        return res
-          .status(404)
-          .json({ success: false, message: "Profile not found" });
-      }
-      profile = await Profile.create({
-        user: req.user.id,
-        profileType: user.role,
-      });
-      profile = await Profile.findById(profile._id).populate(
-        "user",
-        "name email role"
-      );
+      return res
+        .status(404)
+        .json({ success: false, message: "Profile not found" });
     }
 
     res.status(200).json({
@@ -169,6 +166,10 @@ export const updateProfile = async (req, res) => {
       "preferences",
       "companyDetails",
       "isPublic",
+      "skills",
+      "experience",
+      "education",
+      "certifications",
     ];
 
     Object.keys(req.body).forEach((key) => {

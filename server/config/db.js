@@ -1,8 +1,5 @@
-
-
 import { config } from "./env.js";
 import mongoose from "mongoose";
-
 
 const connectDB = async () => {
   try {

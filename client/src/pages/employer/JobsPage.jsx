@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +13,21 @@ import EmptyState from "@/components/shared/EmptyState";
 import { jobService } from "@/lib/services/jobService";
 import { JOB_STATUS_LIST } from "@/lib/constants";
 import { formatDate, debounce, formatSalary } from "@/lib/utils";
-import { Search, Plus, Briefcase, MapPin, Users, Eye, Pencil, Trash2, MoreVertical, X } from "lucide-react";
+import { Search, Plus, Briefcase, MapPin, Users, Pencil, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
-const STATUS_COLORS = {
-    active: "bg-green-100 text-green-800",
-    closed: "bg-gray-100 text-gray-800",
-    draft: "bg-yellow-100 text-yellow-800",
+const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.4 }
+};
+
+const staggerContainer = {
+    animate: {
+        transition: {
+            staggerChildren: 0.06
+        }
+    }
 };
 
 export default function JobsPage() {
@@ -34,6 +43,7 @@ export default function JobsPage() {
         page: 1,
         limit: 10,
     });
+    const [searchTerm, setSearchTerm] = useState("");
 
     const fetchJobs = async (params) => {
         setLoading(true);
@@ -53,19 +63,18 @@ export default function JobsPage() {
 
     useEffect(() => {
         fetchJobs(filters);
-    }, [filters.status, filters.page]);
+    }, [filters.status, filters.page, filters.search]);
 
     const debouncedSearch = useCallback(
         debounce((value) => {
             setFilters((prev) => ({ ...prev, search: value, page: 1 }));
-            fetchJobs({ ...filters, search: value, page: 1 });
         }, 500),
-        [filters]
+        []
     );
 
     const handleSearchChange = (e) => {
         const value = e.target.value;
-        setFilters((prev) => ({ ...prev, search: value }));
+        setSearchTerm(value);
         debouncedSearch(value);
     };
 
@@ -86,62 +95,79 @@ export default function JobsPage() {
 
     const clearFilters = () => {
         setFilters({ search: "", status: "", page: 1, limit: 10 });
-        fetchJobs({ page: 1, limit: 10 });
+        setSearchTerm("");
     };
 
     const hasActiveFilters = filters.search || filters.status;
 
     return (
         <div className="container mx-auto p-6">
-            <div className="flex items-center justify-between mb-6">
+            <motion.div
+                className="flex items-center justify-between mb-6"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
                 <div>
-                    <h1 className="text-2xl font-bold">My Jobs</h1>
-                    <p className="text-muted-foreground">Manage your job postings</p>
+                    <h1 className="text-3xl font-bold">
+                        My <span className="gradient-text">Jobs</span>
+                    </h1>
+                    <p className="text-muted-foreground mt-1">Manage your job postings</p>
                 </div>
-                <Button asChild>
-                    <Link to="/employer/jobs/new">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Post New Job
-                    </Link>
-                </Button>
-            </div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button className="gradient-primary" asChild>
+                        <Link to="/employer/jobs/new">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Post New Job
+                        </Link>
+                    </Button>
+                </motion.div>
+            </motion.div>
 
-            <Card className="mb-6">
-                <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search jobs..."
-                                value={filters.search}
-                                onChange={handleSearchChange}
-                                className="pl-9"
-                            />
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+            >
+                <Card className="mb-6 shadow-lg">
+                    <CardContent className="p-4">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search jobs..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                    className="pl-9"
+                                />
+                            </div>
+                            <Select
+                                value={filters.status || "all"}
+                                onValueChange={(value) => setFilters((prev) => ({ ...prev, status: value === "all" ? "" : value, page: 1 }))}
+                            >
+                                <SelectTrigger className="w-full md:w-48">
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Status</SelectItem>
+                                    {JOB_STATUS_LIST.map((status) => (
+                                        <SelectItem key={status.value} value={status.value}>
+                                            {status.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {hasActiveFilters && (
+                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                    <Button variant="ghost" size="icon" onClick={clearFilters}>
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </motion.div>
+                            )}
                         </div>
-                        <Select
-                            value={filters.status || "all"}
-                            onValueChange={(value) => setFilters((prev) => ({ ...prev, status: value === "all" ? "" : value, page: 1 }))}
-                        >
-                            <SelectTrigger className="w-full md:w-48">
-                                <SelectValue placeholder="Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Status</SelectItem>
-                                {JOB_STATUS_LIST.map((status) => (
-                                    <SelectItem key={status.value} value={status.value}>
-                                        {status.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        {hasActiveFilters && (
-                            <Button variant="ghost" size="icon" onClick={clearFilters}>
-                                <X className="h-4 w-4" />
-                            </Button>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </motion.div>
 
             {loading ? (
                 <div className="space-y-4">
@@ -151,70 +177,88 @@ export default function JobsPage() {
                 </div>
             ) : jobs.length > 0 ? (
                 <>
-                    <div className="space-y-4">
+                    <motion.div
+                        className="space-y-4"
+                        variants={staggerContainer}
+                        initial="initial"
+                        animate="animate"
+                    >
                         {jobs.map((job) => (
-                            <Card key={job._id}>
-                                <CardContent className="p-6">
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <Link
-                                                    to={`/employer/jobs/${job._id}`}
-                                                    className="font-semibold text-lg hover:text-primary truncate"
-                                                >
-                                                    {job.title}
-                                                </Link>
-                                                <Badge className={STATUS_COLORS[job.status]}>{job.status}</Badge>
+                            <motion.div key={job._id} variants={fadeInUp}>
+                                <motion.div
+                                    whileHover={{ scale: 1.01, y: -2 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border hover:border-primary/50 bg-linear-to-br from-card to-muted/10">
+                                        <CardContent className="p-6">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <Link
+                                                            to={`/employer/jobs/${job._id}/applications`}
+                                                            className="font-semibold text-lg hover:text-primary truncate"
+                                                        >
+                                                            {job.title}
+                                                        </Link>
+                                                        <Badge className="gradient-primary text-primary-foreground">{job.status}</Badge>
+                                                    </div>
+                                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                                                        <span className="flex items-center gap-1">
+                                                            <MapPin className="h-4 w-4" />
+                                                            {job.location?.city || "Remote"}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <Briefcase className="h-4 w-4" />
+                                                            {job.employmentType}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <Users className="h-4 w-4" />
+                                                            {job.applicationCount || 0} applicants
+                                                        </span>
+                                                    </div>
+                                                    {job.salary && (
+                                                        <p className="text-sm font-semibold gradient-text mt-2">
+                                                            {formatSalary(job.salary.min, job.salary.max, job.salary.currency)}
+                                                        </p>
+                                                    )}
+                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                        Posted {formatDate(job.createdAt)}
+                                                        {job.deadline && ` • Deadline: ${formatDate(job.deadline)}`}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button variant="outline" size="sm" asChild>
+                                                            <Link to={`/employer/jobs/${job._id}/applications`}>
+                                                                <Users className="h-4 w-4 mr-1" />
+                                                                Applications
+                                                            </Link>
+                                                        </Button>
+                                                    </motion.div>
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button variant="outline" size="sm" asChild>
+                                                            <Link to={`/employer/jobs/${job._id}/edit`}>
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Link>
+                                                        </Button>
+                                                    </motion.div>
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => setDeleteDialog({ open: true, job })}
+                                                        >
+                                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                                        </Button>
+                                                    </motion.div>
+                                                </div>
                                             </div>
-                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                                                <span className="flex items-center gap-1">
-                                                    <MapPin className="h-4 w-4" />
-                                                    {job.location?.city || "Remote"}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <Briefcase className="h-4 w-4" />
-                                                    {job.employmentType}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <Users className="h-4 w-4" />
-                                                    {job.applicationCount || 0} applicants
-                                                </span>
-                                            </div>
-                                            {job.salary && (
-                                                <p className="text-sm font-medium mt-2">
-                                                    {formatSalary(job.salary.min, job.salary.max, job.salary.currency)}
-                                                </p>
-                                            )}
-                                            <p className="text-xs text-muted-foreground mt-1">
-                                                Posted {formatDate(job.createdAt)}
-                                                {job.deadline && ` • Deadline: ${formatDate(job.deadline)}`}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Button variant="outline" size="sm" asChild>
-                                                <Link to={`/employer/jobs/${job._id}/applications`}>
-                                                    <Users className="h-4 w-4 mr-1" />
-                                                    Applications
-                                                </Link>
-                                            </Button>
-                                            <Button variant="outline" size="sm" asChild>
-                                                <Link to={`/employer/jobs/${job._id}/edit`}>
-                                                    <Pencil className="h-4 w-4" />
-                                                </Link>
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setDeleteDialog({ open: true, job })}
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                     <Pagination
                         pagination={pagination}
                         onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
@@ -227,7 +271,7 @@ export default function JobsPage() {
                     description={hasActiveFilters ? "Try adjusting your filters" : "Post your first job to get started"}
                     action={
                         !hasActiveFilters && (
-                            <Button asChild>
+                            <Button asChild className="gradient-primary">
                                 <Link to="/employer/jobs/new">
                                     <Plus className="h-4 w-4 mr-2" />
                                     Post Job

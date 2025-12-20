@@ -44,10 +44,14 @@ describe("Application Routes", () => {
   let testApplication;
 
   beforeAll(async () => {
-    await mongoose.connect(config.MONGODB_URI);
+    await mongoose.connect(config.TEST_URI);
   });
 
   afterAll(async () => {
+    await User.deleteMany({});
+    await Job.deleteMany({});
+    await Application.deleteMany({});
+    await Profile.deleteMany({});
     await mongoose.connection.close();
   });
 

@@ -25,10 +25,13 @@
     "express-validator": "^7.3.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
-    "nodemailer": "^7.0.10"
+    "nodemailer": "^7.0.10",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "jest": "^30.2.0",
-    "nodemon": "^3.1.10"
+    "mongodb-memory-server": "^11.0.0",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4"
   }
 }

@@ -1,5 +1,3 @@
-
-
 import express from "express";
 import { body } from "express-validator";
 import {
@@ -10,6 +8,7 @@ import {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  deleteAccount,
 } from "../controllers/auth.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 
@@ -65,5 +64,7 @@ authRouter.post(
   ],
   resetPassword
 );
+
+authRouter.delete("/delete-account", authenticate, deleteAccount);
 
 export default authRouter;

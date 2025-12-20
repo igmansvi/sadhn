@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,14 +9,22 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { profileService } from "@/lib/services/profileService";
-import { Building2, Globe, MapPin, Phone, Mail, Linkedin, Save } from "lucide-react";
+import { authService } from "@/lib/services/authService";
+import { logout } from "@/store/slices/authSlice";
+import { Building2, Globe, MapPin, Phone, Mail, Linkedin, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [profile, setProfile] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [confirmText, setConfirmText] = useState("");
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -272,6 +282,69 @@ export default function ProfilePage() {
                     </form>
                 </CardContent>
             </Card>
+
+            <Card className="mt-6 border-destructive/50">
+                <CardHeader>
+                    <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="p-4 border border-destructive/30 rounded-lg bg-destructive/5">
+                        <h4 className="font-medium text-destructive mb-2">Delete Account</h4>
+                        <p className="text-sm text-muted-foreground mb-4">
+                            Once you delete your account, there is no going back. This will permanently delete your profile,
+                            job postings, articles, and all associated data.
+                        </p>
+                        <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Account
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="text-destructive">Delete Account</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be undone. This will permanently delete your account, all job postings, articles, and associated data.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <p className="text-sm">
+                            To confirm, type <span className="font-bold">DELETE</span> below:
+                        </p>
+                        <Input
+                            value={confirmText}
+                            onChange={(e) => setConfirmText(e.target.value)}
+                            placeholder="Type DELETE to confirm"
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                        <Button
+                            variant="destructive"
+                            onClick={async () => {
+                                if (confirmText !== "DELETE") return;
+                                setDeleting(true);
+                                try {
+                                    await authService.deleteAccount();
+                                    toast.success("Account deleted successfully");
+                                    dispatch(logout());
+                                    navigate("/");
+                                } catch (err) {
+                                    toast.error(err.response?.data?.message || "Failed to delete account");
+                                } finally {
+                                    setDeleting(false);
+                                }
+                            }}
+                            disabled={confirmText !== "DELETE" || deleting}
+                        >
+                            {deleting ? "Deleting..." : "Delete Account"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

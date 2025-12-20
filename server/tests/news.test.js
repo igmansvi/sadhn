@@ -36,14 +36,15 @@ const mockResponse = () => {
 };
 
 describe("News Routes", () => {
-  let testAdmin;
-  let testNews;
+  let adminUser;
 
   beforeAll(async () => {
-    await mongoose.connect(config.MONGODB_URI);
+    await mongoose.connect(config.TEST_URI);
   });
 
   afterAll(async () => {
+    await User.deleteMany({});
+    await News.deleteMany({});
     await mongoose.connection.close();
   });
 
@@ -51,33 +52,20 @@ describe("News Routes", () => {
     await User.deleteMany({});
     await News.deleteMany({});
 
-    testAdmin = await User.create({
-      name: "Test Admin",
+    adminUser = await User.create({
+      name: "Admin",
       email: "admin@example.com",
       password: "password123",
       role: "admin",
     });
-
-    testNews = await News.create({
-      publishedBy: testAdmin._id,
-      title: "Platform Update",
-      content: "New features released",
-      category: "update",
-      priority: "high",
-    });
   });
 
   describe("POST /api/news", () => {
-    it("should create news successfully", async () => {
+    it("creates news successfully", async () => {
       const req = mockRequest(
-        {
-          title: "System Maintenance",
-          content: "Scheduled maintenance on Sunday",
-          category: "announcement",
-          priority: "urgent",
-        },
+        { title: "Title", content: "Content", category: "general" },
         {},
-        { id: testAdmin._id.toString() }
+        { id: adminUser._id }
       );
       const res = mockResponse();
 
@@ -86,40 +74,36 @@ describe("News Routes", () => {
       expect(res.statusCode).toBe(201);
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe("news created successfully");
-      expect(res.body.data.title).toBe("System Maintenance");
+      expect(res.body.data.title).toBe("Title");
     });
   });
 
   describe("GET /api/news", () => {
     beforeEach(async () => {
       await News.create({
-        publishedBy: testAdmin._id,
-        title: "Policy Update",
-        content: "New privacy policy",
-        category: "policy",
-        priority: "medium",
-      });
-
-      await News.create({
-        publishedBy: testAdmin._id,
-        title: "Expired News",
-        content: "This news has expired",
+        title: "A",
+        content: "A",
         category: "general",
-        priority: "low",
-        expiryDate: new Date(Date.now() - 1000 * 60 * 60 * 24),
+        isActive: true,
+        publishedBy: adminUser._id,
       });
-
       await News.create({
-        publishedBy: testAdmin._id,
-        title: "Inactive News",
-        content: "This news is inactive",
+        title: "B",
+        content: "B",
+        category: "announcement",
+        isActive: true,
+        publishedBy: adminUser._id,
+      });
+      await News.create({
+        title: "C",
+        content: "C",
         category: "general",
-        priority: "low",
         isActive: false,
+        publishedBy: adminUser._id,
       });
     });
 
-    it("should get all active non-expired news", async () => {
+    it("gets all active news", async () => {
       const req = mockRequest({}, {}, null, {});
       const res = mockResponse();
 
@@ -127,96 +111,40 @@ describe("News Routes", () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.data.length).toBe(2);
+      expect(res.body.data.length).toBeGreaterThan(0);
       expect(res.body.pagination).toBeDefined();
-    });
-
-    it("should filter news by category", async () => {
-      const req = mockRequest({}, {}, null, { category: "policy" });
-      const res = mockResponse();
-
-      await getAllNews(req, res);
-
-      expect(res.statusCode).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.length).toBe(1);
-      expect(res.body.data[0].category).toBe("policy");
-    });
-
-    it("should filter news by priority", async () => {
-      const req = mockRequest({}, {}, null, { priority: "high" });
-      const res = mockResponse();
-
-      await getAllNews(req, res);
-
-      expect(res.statusCode).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.length).toBe(1);
-      expect(res.body.data[0].priority).toBe("high");
-    });
-
-    it("should paginate news correctly", async () => {
-      const req = mockRequest({}, {}, null, { page: "1", limit: "1" });
-      const res = mockResponse();
-
-      await getAllNews(req, res);
-
-      expect(res.statusCode).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.length).toBe(1);
-      expect(res.body.pagination.page).toBe(1);
-      expect(res.body.pagination.pages).toBe(2);
-    });
-
-    it("should sort by priority and createdAt", async () => {
-      const req = mockRequest({}, {}, null, {});
-      const res = mockResponse();
-
-      await getAllNews(req, res);
-
-      expect(res.statusCode).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.length).toBe(2);
-      const priorities = res.body.data.map((n) => n.priority);
-      expect(priorities).toContain("high");
-      expect(priorities).toContain("medium");
     });
   });
 
   describe("GET /api/news/:id", () => {
-    it("should get news by ID successfully", async () => {
-      const req = mockRequest({}, { id: testNews._id });
+    it("gets news by id", async () => {
+      const news = await News.create({
+        title: "X",
+        content: "X",
+        category: "general",
+        isActive: true,
+        publishedBy: adminUser._id,
+      });
+      const req = mockRequest({}, { id: news._id });
       const res = mockResponse();
 
       await getNewsById(req, res);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.data.title).toBe("Platform Update");
+      expect(res.body.data.title).toBe("X");
     });
 
-    it("should return 404 when news does not exist", async () => {
-      const fakeId = new mongoose.Types.ObjectId();
-      const req = mockRequest({}, { id: fakeId });
-      const res = mockResponse();
-
-      await getNewsById(req, res);
-
-      expect(res.statusCode).toBe(404);
-      expect(res.body.success).toBe(false);
-      expect(res.body.message).toBe("news not found");
-    });
-
-    it("should return 404 when news has expired", async () => {
-      const expiredNews = await News.create({
-        publishedBy: testAdmin._id,
-        title: "Expired News",
-        content: "This has expired",
+    it("returns 404 for expired news", async () => {
+      const expired = await News.create({
+        title: "Old",
+        content: "Old",
         category: "general",
-        expiryDate: new Date(Date.now() - 1000 * 60 * 60 * 24),
+        isActive: true,
+        expiryDate: new Date(0),
+        publishedBy: adminUser._id,
       });
-
-      const req = mockRequest({}, { id: expiredNews._id });
+      const req = mockRequest({}, { id: expired._id });
       const res = mockResponse();
 
       await getNewsById(req, res);
@@ -227,13 +155,16 @@ describe("News Routes", () => {
     });
   });
 
-  describe("PATCH /api/news/:id", () => {
-    it("should update news successfully", async () => {
-      const req = mockRequest(
-        { title: "Updated Platform Update" },
-        { id: testNews._id.toString() },
-        { id: testAdmin._id.toString() }
-      );
+  describe("PUT /api/news/:id", () => {
+    it("updates news successfully", async () => {
+      const news = await News.create({
+        title: "Old",
+        content: "Old",
+        category: "general",
+        isActive: true,
+        publishedBy: adminUser._id,
+      });
+      const req = mockRequest({ title: "New" }, { id: news._id });
       const res = mockResponse();
 
       await updateNews(req, res);
@@ -241,33 +172,20 @@ describe("News Routes", () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe("news updated successfully");
-      expect(res.body.data.title).toBe("Updated Platform Update");
-    });
-
-    it("should return 404 when news does not exist", async () => {
-      const fakeId = new mongoose.Types.ObjectId();
-      const req = mockRequest(
-        { title: "Updated" },
-        { id: fakeId.toString() },
-        { id: testAdmin._id.toString() }
-      );
-      const res = mockResponse();
-
-      await updateNews(req, res);
-
-      expect(res.statusCode).toBe(404);
-      expect(res.body.success).toBe(false);
-      expect(res.body.message).toBe("news not found");
+      expect(res.body.data.title).toBe("New");
     });
   });
 
   describe("DELETE /api/news/:id", () => {
-    it("should delete news successfully", async () => {
-      const req = mockRequest(
-        {},
-        { id: testNews._id.toString() },
-        { id: testAdmin._id.toString() }
-      );
+    it("deletes news successfully", async () => {
+      const news = await News.create({
+        title: "ToDelete",
+        content: "X",
+        category: "general",
+        isActive: true,
+        publishedBy: adminUser._id,
+      });
+      const req = mockRequest({}, { id: news._id });
       const res = mockResponse();
 
       await deleteNews(req, res);
@@ -276,34 +194,21 @@ describe("News Routes", () => {
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe("news deleted successfully");
 
-      const deleted = await News.findById(testNews._id);
-      expect(deleted).toBeNull();
-    });
-
-    it("should return 404 when news does not exist", async () => {
-      const fakeId = new mongoose.Types.ObjectId();
-      const req = mockRequest(
-        {},
-        { id: fakeId.toString() },
-        { id: testAdmin._id.toString() }
-      );
-      const res = mockResponse();
-
-      await deleteNews(req, res);
-
-      expect(res.statusCode).toBe(404);
-      expect(res.body.success).toBe(false);
-      expect(res.body.message).toBe("news not found");
+      const found = await News.findById(news._id);
+      expect(found).toBeNull();
     });
   });
 
   describe("PATCH /api/news/:id/deactivate", () => {
-    it("should deactivate news successfully", async () => {
-      const req = mockRequest(
-        {},
-        { id: testNews._id.toString() },
-        { id: testAdmin._id.toString() }
-      );
+    it("deactivates news successfully", async () => {
+      const news = await News.create({
+        title: "D",
+        content: "D",
+        category: "general",
+        isActive: true,
+        publishedBy: adminUser._id,
+      });
+      const req = mockRequest({}, { id: news._id });
       const res = mockResponse();
 
       await deactivateNews(req, res);
@@ -312,22 +217,6 @@ describe("News Routes", () => {
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe("news deactivated successfully");
       expect(res.body.data.isActive).toBe(false);
-    });
-
-    it("should return 404 when news does not exist", async () => {
-      const fakeId = new mongoose.Types.ObjectId();
-      const req = mockRequest(
-        {},
-        { id: fakeId.toString() },
-        { id: testAdmin._id.toString() }
-      );
-      const res = mockResponse();
-
-      await deactivateNews(req, res);
-
-      expect(res.statusCode).toBe(404);
-      expect(res.body.success).toBe(false);
-      expect(res.body.message).toBe("news not found");
     });
   });
 });

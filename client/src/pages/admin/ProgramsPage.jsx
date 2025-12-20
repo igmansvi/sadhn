@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,7 @@ export default function ProgramsPage() {
         page: 1,
         limit: 10,
     });
+    const [searchTerm, setSearchTerm] = useState("");
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -52,7 +54,14 @@ export default function ProgramsPage() {
             const cleanParams = Object.fromEntries(
                 Object.entries(params).filter(([_, v]) => v !== "" && v !== null)
             );
-            const response = await skillProgramService.getPrograms(cleanParams);
+            let response;
+            if (cleanParams.search) {
+                const { search, ...rest } = cleanParams;
+                const searchParams = { q: search, ...rest };
+                response = await skillProgramService.searchPrograms(searchParams);
+            } else {
+                response = await skillProgramService.getPrograms(cleanParams);
+            }
             setPrograms(response.data || []);
             setPagination(response.pagination);
         } catch (err) {
@@ -64,19 +73,18 @@ export default function ProgramsPage() {
 
     useEffect(() => {
         fetchPrograms(filters);
-    }, [filters.level, filters.page]);
+    }, [filters.level, filters.page, filters.search]);
 
     const debouncedSearch = useCallback(
         debounce((value) => {
             setFilters((prev) => ({ ...prev, search: value, page: 1 }));
-            fetchPrograms({ ...filters, search: value, page: 1 });
         }, 500),
-        [filters]
+        []
     );
 
     const handleSearchChange = (e) => {
         const value = e.target.value;
-        setFilters((prev) => ({ ...prev, search: value }));
+        setSearchTerm(value);
         debouncedSearch(value);
     };
 
@@ -134,8 +142,12 @@ export default function ProgramsPage() {
     };
 
     const handleSave = async () => {
-        if (!formData.title || !formData.platform || !formData.url) {
-            toast.error("Title, platform, and URL are required");
+        if (!formData.title || !formData.platform || !formData.url || !formData.description) {
+            toast.error("Title, platform, URL, and description are required");
+            return;
+        }
+        if (!formData.skillsCovered || formData.skillsCovered.length === 0) {
+            toast.error("At least one skill must be added");
             return;
         }
         setSaving(true);
@@ -173,6 +185,7 @@ export default function ProgramsPage() {
 
     const clearFilters = () => {
         setFilters({ search: "", level: "", page: 1, limit: 10 });
+        setSearchTerm("");
         fetchPrograms({ page: 1, limit: 10 });
     };
 
@@ -180,53 +193,68 @@ export default function ProgramsPage() {
 
     return (
         <div className="container mx-auto p-6">
-            <div className="flex items-center justify-between mb-6">
+            <motion.div
+                className="flex items-center justify-between mb-6"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
                 <div>
-                    <h1 className="text-2xl font-bold">Skill Programs</h1>
-                    <p className="text-muted-foreground">Manage learning programs and courses</p>
+                    <h1 className="text-3xl font-bold">
+                        Skill <span className="gradient-text">Programs</span>
+                    </h1>
+                    <p className="text-muted-foreground mt-1">Manage learning programs and courses</p>
                 </div>
-                <Button onClick={() => openFormDialog()}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Program
-                </Button>
-            </div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button className="gradient-primary" onClick={() => openFormDialog()}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Program
+                    </Button>
+                </motion.div>
+            </motion.div>
 
-            <Card className="mb-6">
-                <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search programs..."
-                                value={filters.search}
-                                onChange={handleSearchChange}
-                                className="pl-9"
-                            />
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+            >
+                <Card className="mb-6 shadow-lg">
+                    <CardContent className="p-4">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search programs..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                    className="pl-9"
+                                />
+                            </div>
+                            <Select
+                                value={filters.level || "all"}
+                                onValueChange={(value) => setFilters((prev) => ({ ...prev, level: value === "all" ? "" : value, page: 1 }))}
+                            >
+                                <SelectTrigger className="w-full md:w-48">
+                                    <SelectValue placeholder="Level" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Levels</SelectItem>
+                                    {PROGRAM_LEVELS.map((level) => (
+                                        <SelectItem key={level.value} value={level.value}>
+                                            {level.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {hasActiveFilters && (
+                                <Button variant="ghost" size="icon" onClick={clearFilters}>
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            )}
                         </div>
-                        <Select
-                            value={filters.level || "all"}
-                            onValueChange={(value) => setFilters((prev) => ({ ...prev, level: value === "all" ? "" : value, page: 1 }))}
-                        >
-                            <SelectTrigger className="w-full md:w-48">
-                                <SelectValue placeholder="Level" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Levels</SelectItem>
-                                {PROGRAM_LEVELS.map((level) => (
-                                    <SelectItem key={level.value} value={level.value}>
-                                        {level.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        {hasActiveFilters && (
-                            <Button variant="ghost" size="icon" onClick={clearFilters}>
-                                <X className="h-4 w-4" />
-                            </Button>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </motion.div>
 
             {loading ? (
                 <div className="space-y-4">
@@ -237,83 +265,101 @@ export default function ProgramsPage() {
             ) : programs.length > 0 ? (
                 <>
                     <div className="space-y-4">
-                        {programs.map((program) => (
-                            <Card key={program._id}>
-                                <CardContent className="p-6">
-                                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <h3 className="font-semibold truncate">{program.title}</h3>
-                                                <Badge variant="outline">{program.level}</Badge>
-                                                {program.price?.isFree ? (
-                                                    <Badge className="bg-green-100 text-green-800">Free</Badge>
-                                                ) : (
-                                                    <Badge variant="secondary">
-                                                        {program.price?.currency} {program.price?.amount}
-                                                    </Badge>
-                                                )}
-                                                {program.certificateOffered && (
-                                                    <Badge variant="secondary" className="gap-1">
-                                                        <Award className="h-3 w-3" />
-                                                        Certificate
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            <p className="text-sm text-muted-foreground mb-2">{program.platform}</p>
-                                            {program.description && (
-                                                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                                                    {program.description}
-                                                </p>
-                                            )}
-                                            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                                                {program.duration && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Clock className="h-3 w-3" />
-                                                        {program.duration.value} {program.duration.unit}
-                                                    </span>
-                                                )}
-                                                {program.rating && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                                        {program.rating}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            {program.skillsCovered?.length > 0 && (
-                                                <div className="flex flex-wrap gap-1 mt-2">
-                                                    {program.skillsCovered.slice(0, 4).map((skill, idx) => (
-                                                        <Badge key={idx} variant="outline" className="text-xs">
-                                                            {skill}
-                                                        </Badge>
-                                                    ))}
-                                                    {program.skillsCovered.length > 4 && (
-                                                        <Badge variant="outline" className="text-xs">
-                                                            +{program.skillsCovered.length - 4}
-                                                        </Badge>
+                        {programs.map((program, index) => (
+                            <motion.div
+                                key={program._id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                            >
+                                <motion.div
+                                    whileHover={{ scale: 1.01, y: -2 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border hover:border-primary/50 bg-linear-to-br from-card to-muted/10">
+                                        <CardContent className="p-6">
+                                            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <h3 className="font-semibold truncate">{program.title}</h3>
+                                                        <Badge variant="outline">{program.level}</Badge>
+                                                        {program.price?.isFree ? (
+                                                            <Badge className="bg-green-100 text-green-800">Free</Badge>
+                                                        ) : (
+                                                            <Badge variant="secondary">
+                                                                {program.price?.currency} {program.price?.amount}
+                                                            </Badge>
+                                                        )}
+                                                        {program.certificateOffered && (
+                                                            <Badge variant="secondary" className="gap-1">
+                                                                <Award className="h-3 w-3" />
+                                                                Certificate
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-muted-foreground mb-2">{program.platform}</p>
+                                                    {program.description && (
+                                                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                                                            {program.description}
+                                                        </p>
+                                                    )}
+                                                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                                                        {program.duration && (
+                                                            <span className="flex items-center gap-1">
+                                                                <Clock className="h-3 w-3" />
+                                                                {program.duration.value} {program.duration.unit}
+                                                            </span>
+                                                        )}
+                                                        {program.rating && (
+                                                            <span className="flex items-center gap-1">
+                                                                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                                                {program.rating}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    {program.skillsCovered?.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1 mt-2">
+                                                            {program.skillsCovered.slice(0, 4).map((skill, idx) => (
+                                                                <Badge key={idx} variant="outline" className="text-xs">
+                                                                    {skill}
+                                                                </Badge>
+                                                            ))}
+                                                            {program.skillsCovered.length > 4 && (
+                                                                <Badge variant="outline" className="text-xs">
+                                                                    +{program.skillsCovered.length - 4}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                     )}
                                                 </div>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Button variant="outline" size="sm" asChild>
-                                                <a href={program.url} target="_blank" rel="noopener noreferrer">
-                                                    <ExternalLink className="h-4 w-4" />
-                                                </a>
-                                            </Button>
-                                            <Button variant="outline" size="sm" onClick={() => openFormDialog(program)}>
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setDeleteDialog({ open: true, item: program })}
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                                <div className="flex items-center gap-2">
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button variant="outline" size="sm" asChild>
+                                                            <a href={program.url} target="_blank" rel="noopener noreferrer">
+                                                                <ExternalLink className="h-4 w-4" />
+                                                            </a>
+                                                        </Button>
+                                                    </motion.div>
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button variant="outline" size="sm" onClick={() => openFormDialog(program)}>
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                    </motion.div>
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => setDeleteDialog({ open: true, item: program })}
+                                                        >
+                                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                                        </Button>
+                                                    </motion.div>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            </motion.div>
                         ))}
                     </div>
                     <Pagination
@@ -373,7 +419,7 @@ export default function ProgramsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="description">Description</Label>
+                            <Label htmlFor="description">Description *</Label>
                             <Textarea
                                 id="description"
                                 value={formData.description}
@@ -489,7 +535,7 @@ export default function ProgramsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Skills Covered</Label>
+                            <Label>Skills Covered *</Label>
                             <div className="flex gap-2">
                                 <Input
                                     value={skillInput}

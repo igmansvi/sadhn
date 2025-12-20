@@ -51,10 +51,12 @@ describe("Profile Routes", () => {
   let testProfile;
 
   beforeAll(async () => {
-    await mongoose.connect(config.MONGODB_URI);
+    await mongoose.connect(config.TEST_URI);
   });
 
   afterAll(async () => {
+    await User.deleteMany({});
+    await Profile.deleteMany({});
     await mongoose.connection.close();
   });
 
