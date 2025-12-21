@@ -57,7 +57,6 @@ export default function ProgramDetailPage() {
                 const msg = err.response?.data?.message || "Failed to load program details";
                 setError(msg);
                 toast.error(msg);
-                console.error("Failed to fetch program:", err);
             } finally {
                 setLoading(false);
             }

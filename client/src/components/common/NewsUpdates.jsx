@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { newsService } from "@/lib/services/newsService";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 export default function NewsUpdates() {
     const [news, setNews] = useState([]);
@@ -25,7 +26,7 @@ export default function NewsUpdates() {
                         setNews(res.data.data);
                     }
                 })
-                .catch(err => console.error(err))
+                .catch(err => toast.error("Failed to load news"))
                 .finally(() => setLoading(false));
         }
     }, [isOpen]);

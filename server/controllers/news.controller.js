@@ -35,21 +35,36 @@ export const getAllNews = async (req, res) => {
     const {
       category,
       priority,
+      search,
       page = 1,
       limit = 20,
       sortBy = "createdAt",
       sortOrder = "desc",
+      includeInactive = false,
     } = req.query;
 
-    const query = { isActive: true };
+    const query = {};
+
+    if (includeInactive !== 'true' && !req.user?.role?.includes('admin')) {
+      query.isActive = true;
+      query.$or = [
+        { expiryDate: { $exists: false } },
+        { expiryDate: { $gt: new Date() } },
+      ];
+    }
 
     if (category) query.category = category;
     if (priority) query.priority = priority;
 
-    query.$or = [
-      { expiryDate: { $exists: false } },
-      { expiryDate: { $gt: new Date() } },
-    ];
+    if (search) {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [
+          { title: { $regex: search, $options: 'i' } },
+          { content: { $regex: search, $options: 'i' } },
+        ],
+      });
+    }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const sort = { priority: -1, [sortBy]: sortOrder === "desc" ? -1 : 1 };

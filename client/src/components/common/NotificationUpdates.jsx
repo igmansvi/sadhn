@@ -27,7 +27,7 @@ export default function NotificationBell() {
                 setUnreadCount(response.data.data.unreadCount);
             }
         } catch (error) {
-            console.error("Failed to fetch notifications", error);
+            toast.error("Failed to fetch notifications");
         }
     };
 
@@ -54,7 +54,7 @@ export default function NotificationBell() {
                     prev.map((n) => ({ ...n, isRead: true }))
                 );
             } catch (error) {
-                console.error("Failed to mark read", error);
+                toast.error("Failed to mark notifications as read");
             }
         }
     };

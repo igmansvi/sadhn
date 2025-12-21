@@ -14,6 +14,7 @@ import dashboardRouter from "./routes/dashboard.route.js";
 import newsRouter from "./routes/news.route.js";
 import matchingRouter from "./routes/matching.route.js";
 import notificationRouter from "./routes/notification.route.js";
+import contactRouter from "./routes/contact.route.js";
 import { requestLogger } from "./utils/logger.js";
 
 const app = express();
@@ -68,6 +69,7 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/news", newsRouter);
 app.use("/api/matching", matchingRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/contact", contactRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -14,7 +14,7 @@ import EmptyState from "@/components/shared/EmptyState";
 import { newsService } from "@/lib/services/newsService";
 import { NEWS_CATEGORIES } from "@/lib/constants";
 import { debounce, formatDate } from "@/lib/utils";
-import { Search, Plus, Newspaper, Pencil, Trash2, X } from "lucide-react";
+import { Search, Plus, Newspaper, Pencil, Trash2, X, Ban, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const PRIORITY_COLORS = {
@@ -31,6 +31,7 @@ export default function NewsPage() {
     const [deleteDialog, setDeleteDialog] = useState({ open: false, item: null });
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [toggling, setToggling] = useState(null);
     const [filters, setFilters] = useState({
         search: "",
         category: "",
@@ -135,6 +136,24 @@ export default function NewsPage() {
             toast.error("Failed to delete");
         } finally {
             setDeleting(false);
+        }
+    };
+
+    const handleToggleActive = async (item) => {
+        setToggling(item._id);
+        try {
+            if (item.isActive === false) {
+                await newsService.updateNews(item._id, { isActive: true });
+                toast.success("News activated");
+            } else {
+                await newsService.deactivateNews(item._id);
+                toast.success("News deactivated");
+            }
+            fetchNews(filters);
+        } catch (err) {
+            toast.error("Failed to update status");
+        } finally {
+            setToggling(null);
         }
     };
 
@@ -251,6 +270,20 @@ export default function NewsPage() {
                                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                         <Button variant="outline" size="sm" onClick={() => openFormDialog(item)}>
                                                             <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                    </motion.div>
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleToggleActive(item)}
+                                                            disabled={toggling === item._id}
+                                                        >
+                                                            {item.isActive === false ? (
+                                                                <CheckCircle className="h-4 w-4 text-green-600" />
+                                                            ) : (
+                                                                <Ban className="h-4 w-4 text-orange-600" />
+                                                            )}
                                                         </Button>
                                                     </motion.div>
                                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

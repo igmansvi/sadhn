@@ -114,6 +114,37 @@ describe("News Routes", () => {
       expect(res.body.data.length).toBeGreaterThan(0);
       expect(res.body.pagination).toBeDefined();
     });
+
+    it("filters news by category", async () => {
+      const req = mockRequest({}, {}, null, { category: "announcement" });
+      const res = mockResponse();
+
+      await getAllNews(req, res);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.every(item => item.category === "announcement")).toBe(true);
+    });
+
+    it("searches news by title and content", async () => {
+      const req = mockRequest({}, {}, null, { search: "A" });
+      const res = mockResponse();
+
+      await getAllNews(req, res);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
+
+    it("includes inactive news for admin when includeInactive is true", async () => {
+      const req = mockRequest({}, {}, { id: adminUser._id, role: ["admin"] }, { includeInactive: "true" });
+      const res = mockResponse();
+
+      await getAllNews(req, res);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
   });
 
   describe("GET /api/news/:id", () => {
