@@ -47,10 +47,9 @@ export const getAllNews = async (req, res) => {
 
     if (includeInactive !== 'true' && !req.user?.role?.includes('admin')) {
       query.isActive = true;
-      query.$or = [
-        { expiryDate: { $exists: false } },
-        { expiryDate: { $gt: new Date() } },
-      ];
+      query.expiryDate = { $gt: new Date() };
+    } else if (req.user?.role?.includes('admin') && includeInactive !== 'true') {
+      query.expiryDate = { $gt: new Date() };
     }
 
     if (category) query.category = category;

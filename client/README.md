@@ -38,17 +38,17 @@ src/
 │   └── common/          # Feature-specific components (NewsUpdates, NotificationUpdates)
 ├── pages/
 │   ├── auth/            # Authentication pages (Login, Register, ForgotPassword, ResetPassword, VerifyEmail)
-│   ├── common/          # Public pages (Home, Articles, ArticleDetail, Jobs, JobDetail, Programs, ProgramDetail)
+│   ├── common/          # Public pages (Home, About, Contact, Articles, ArticleDetail, Jobs, JobDetail, Programs, ProgramDetail)
 │   ├── learner/         # Learner features (Dashboard, Profile, Jobs, JobDetail, Applications, Explore, Onboarding, Programs)
 │   ├── employer/        # Employer features (Dashboard, Profile, Jobs, JobForm, Applications, Articles, ArticleForm)
-│   └── admin/           # Admin features (Dashboard, News, Programs, Users)
+│   └── admin/           # Admin features (Dashboard, News, Programs, Users, Contacts)
 ├── routes/
 │   ├── index.jsx        # Main route configuration
-│   ├── authRoutes.jsx   # Authentication routes
-│   ├── publicRoutes.jsx # Public accessible routes
-│   ├── learnerRoutes.jsx    # Learner protected routes
-│   ├── employerRoutes.jsx   # Employer protected routes
-│   └── adminRoutes.jsx  # Admin protected routes
+│   ├── authRoutes.jsx   # Authentication routes (/login, /register, /forgot-password, /reset-password, /verify-email)
+│   ├── publicRoutes.jsx # Public accessible routes (/, /about, /contact, /jobs, /articles, /programs)
+│   ├── learnerRoutes.jsx    # Learner protected routes (/learner/*)
+│   ├── employerRoutes.jsx   # Employer protected routes (/employer/*)
+│   └── adminRoutes.jsx  # Admin protected routes (/admin/*)
 ├── layouts/
 │   ├── MainLayout.jsx       # Main layout with navbar and footer
 │   ├── AuthLayout.jsx       # Centered auth layout
@@ -70,6 +70,7 @@ src/
 │       ├── dashboardService.js
 │       ├── notificationService.js
 │       ├── matchingService.js
+│       ├── contactService.js
 │       └── socketService.js
 ├── store/
 │   ├── index.js         # Redux store configuration
@@ -114,10 +115,19 @@ src/
 **Admin Dashboard**
 
 - Platform statistics and insights
-- News/announcement management
+- News/announcement management with search and activation toggle
 - Skill program administration
 - User management and moderation
+- Contact form submissions management
+- Reply to contact inquiries with email notifications
 - Content moderation
+
+**Public Pages**
+
+- About page with mission, vision, and values
+- Contact form for user inquiries
+- Real-time news updates popover
+- Real-time notification updates popover
 
 ## API Integration
 
@@ -140,9 +150,10 @@ export const jobService = {
 
 - Base URL: `http://localhost:5000/api`
 - Bearer token auto-injection in Authorization header
-- Global error handling with toast notifications
+- Global error handling with toast notifications (Sonner)
 - Request/response interceptors for logging
 - Automatic 401 handling with redirect to login
+- No console.error in production (replaced with toast notifications)
 
 ## State Management
 
@@ -188,7 +199,11 @@ src/
 │       ├── articleService.js
 │       ├── newsService.js
 │       ├── skillProgramService.js
-│       └── dashboardService.js
+│       ├── dashboardService.js
+│       ├── notificationService.js
+│       ├── matchingService.js
+│       ├── contactService.js
+│       └── socketService.js
 ├── store/
 │   ├── index.js         # Redux store
 │   └── slices
@@ -284,7 +299,7 @@ function JobsList() {
 }
 ````
 
-### Service Modules to Create
+### Service Modules Implemented
 
 All service files in `lib/services/`:
 
@@ -293,22 +308,29 @@ All service files in `lib/services/`:
 - `jobService.js` - CRUD jobs, search, filters
 - `applicationService.js` - Apply, withdraw, update status
 - `articleService.js` - CRUD articles, publish
-- `newsService.js` - CRUD news/announcements
+- `newsService.js` - CRUD news/announcements with search and deactivation
 - `skillProgramService.js` - Browse skill programs
 - `dashboardService.js` - Get dashboard data
+- `notificationService.js` - Fetch and mark notifications as read
+- `matchingService.js` - Job recommendations
+- `contactService.js` - Submit contact form, admin CRUD operations
+- `socketService.js` - Real-time WebSocket connection
 
 ### API Endpoints Reference
 
-All endpoints tested and documented via backend tests (175 passing tests):
+All endpoints tested and documented via backend tests:
 
-**Auth**: `/api/auth/*`
-**Profile**: `/api/profile/*`
-**Jobs**: `/api/jobs/*`
-**Applications**: `/api/applications/*`
-**Articles**: `/api/articles/*`
-**News**: `/api/news/*`
-**Skill Programs**: `/api/skill-programs/*`
-**Dashboard**: `/api/dashboard/*`
+**Auth**: `/api/auth/*` - Login, register, password reset, email verification
+**Profile**: `/api/profile/*` - User profiles, skills, experience, education
+**Jobs**: `/api/jobs/*` - Job CRUD, search, filters
+**Applications**: `/api/applications/*` - Apply, track, update status
+**Articles**: `/api/articles/*` - Company articles management
+**News**: `/api/news/*` - News with search, category filter, activation toggle
+**Skill Programs**: `/api/skill-programs/*` - Training programs
+**Dashboard**: `/api/dashboard/*` - Analytics and statistics
+**Notifications**: `/api/notifications/*` - Real-time notifications
+**Matching**: `/api/matching/*` - Job recommendations
+**Contact**: `/api/contact/*` - Contact form and admin replies
 
 ---
 
@@ -634,8 +656,12 @@ export const serviceName = {
 - ✅ Employer job management
 - ✅ Application management for employers
 - ✅ Article creation and management
-- ✅ Admin news management
+- ✅ Admin news management with search and deactivation
 - ✅ Skill programs management
+- ✅ Contact form on public pages
+- ✅ Admin contact submissions management with reply functionality
+- ✅ Real-time news and notification updates
+- ✅ Toast notifications for all errors (no console.error)
 - ✅ Lazy loading and code splitting
 - ✅ Pagination and search optimization
 - ✅ Export functionality

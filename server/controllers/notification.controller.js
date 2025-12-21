@@ -3,7 +3,10 @@ import Notification from "../models/notification.model.js";
 export const getNotifications = async (req, res) => {
   try {
     const userId = req.user.id;
-    const notifications = await Notification.find({ recipient: userId })
+    const notifications = await Notification.find({ 
+      recipient: userId,
+      expiryDate: { $gt: new Date() },
+    })
       .sort({ createdAt: -1 })
       .populate("sender", "name email")
       .limit(50);
@@ -11,6 +14,7 @@ export const getNotifications = async (req, res) => {
     const unreadCount = await Notification.countDocuments({
       recipient: userId,
       isRead: false,
+      expiryDate: { $gt: new Date() },
     });
 
     res.json({

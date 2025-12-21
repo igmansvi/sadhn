@@ -30,6 +30,10 @@ const notificationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  expiryDate: {
+    type: Date,
+    default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  },
 });
 
 const Notification = mongoose.model("Notification", notificationSchema);

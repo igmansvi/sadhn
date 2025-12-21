@@ -16,6 +16,7 @@ import matchingRouter from "./routes/matching.route.js";
 import notificationRouter from "./routes/notification.route.js";
 import contactRouter from "./routes/contact.route.js";
 import { requestLogger } from "./utils/logger.js";
+import { startCleanupScheduler } from "./utils/cleanup.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -27,6 +28,8 @@ const io = new Server(server, {
 });
 
 connectDB();
+
+startCleanupScheduler();
 
 app.use(
   cors({

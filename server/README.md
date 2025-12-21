@@ -53,11 +53,12 @@ server/
 │   ├── job.controller.js         # Job CRUD and filtering
 │   ├── application.controller.js # Job applications management
 │   ├── article.controller.js     # Article publication
-│   ├── news.controller.js        # News and announcements
+│   ├── news.controller.js        # News and announcements with search
 │   ├── notification.controller.js # User notifications
 │   ├── skillprogram.controller.js # Skill programs
 │   ├── matching.controller.js    # Job recommendations
-│   └── dashboard.controller.js   # Analytics and statistics
+│   ├── dashboard.controller.js   # Analytics and statistics
+│   └── contact.controller.js     # Contact form and admin replies
 ├── models/               # Mongoose schemas
 │   ├── user.model.js             # User authentication and role
 │   ├── profile.model.js          # Extended profile data
@@ -65,9 +66,10 @@ server/
 │   ├── job.model.js              # Job postings
 │   ├── application.model.js      # Job applications
 │   ├── article.model.js          # Company articles
-│   ├── news.model.js             # Platform news
-│   ├── notification.model.js     # User notifications
-│   └── skillprogram.model.js     # Training programs
+│   ├── news.model.js             # Platform news with 30-day expiry
+│   ├── notification.model.js     # User notifications with 7-day expiry
+│   ├── skillprogram.model.js     # Training programs
+│   └── contact.model.js          # Contact form submissions with 90-day expiry
 ├── routes/              # API endpoint definitions
 │   ├── auth.route.js             # /api/auth/*
 │   ├── profile.route.js          # /api/profile/*
@@ -78,11 +80,13 @@ server/
 │   ├── notification.route.js     # /api/notifications/*
 │   ├── skillprogram.route.js     # /api/skill-programs/*
 │   ├── matching.route.js         # /api/matching/*
-│   └── dashboard.route.js        # /api/dashboard/*
+│   ├── dashboard.route.js        # /api/dashboard/*
+│   └── contact.route.js          # /api/contact/*
 ├── utils/
 │   ├── email.js                  # Email template and sending logic
-│   └── logger.js                 # Request and error logging
-└── tests/                        # Test suite (175 tests covering all endpoints)
+│   ├── logger.js                 # Request and error logging
+│   └── cleanup.js                # Automated cleanup scheduler
+└── tests/                        # Test suite covering all endpoints
     ├── auth.test.js
     ├── profile.test.js
     ├── job.test.js
@@ -92,7 +96,8 @@ server/
     ├── notification.test.js
     ├── skillprogram.test.js
     ├── matching.test.js
-    └── dashboard.test.js
+    ├── dashboard.test.js
+    └── contact.test.js
 ```
 
 ## Database Schema Overview
@@ -236,14 +241,29 @@ Query Parameters: `search`, `location`, `type`, `status`, `minSalary`, `maxSalar
 | GET    | `/my-articles` | Get employer's articles    | Protected (Employer) |
 | PATCH  | `/:id/publish` | Publish/unpublish article  | Protected (Employer) |
 
-### News Routes - `/api/news`
+Query Parameters: `search`, `category`, `includeInactive`, `page`, `limit`
 
-| Method | Endpoint             | Description                   | Access            |
-| ------ | -------------------- | ----------------------------- | ----------------- |
-| GET    | `/`                  | Get active news/announcements | Public            |
-| GET    | `/:id`               | Get news by ID                | Public            |
-| POST   | `/`                  | Create news post              | Protected (Admin) |
-| PATCH  | `/:id`               | Update news                   | Protected (Admin) |
+| Method | Endpoint            | Description                   | Access            |
+| ------ | ------------------- | ----------------------------- | ----------------- |
+| GET    | `/`                 | Get active news with search   | Public            |
+| GET    | `/:id`              | Get news by ID                | Public            |
+| POST   | `/`                 | Create news post              | Protected (Admin) |
+| PUT    | `/:id`              | Update news                   | Protected (Admin) |
+| DELETE | `/:id`              | Delete news                   | Protected (Admin) |
+| PATCH  | `/:id/deactivate`   | Activate/deactivate news      | Protected (Admin) |
+
+### Contact Routes - `/api/contact`
+
+Query Parameters: `status`, `search`, `page`, `limit`
+
+| Method | Endpoint       | Description                  | Access            |
+| ------ | -------------- | ---------------------------- | ----------------- |
+| POST   | `/`            | Submit contact form          | Public            |
+| GET    | `/all`         | Get all contact submissions  | Protected (Admin) |
+| GET    | `/:id`         | Get contact by ID            | Protected (Admin) |
+| PATCH  | `/:id`         | Update contact status        | Protected (Admin) |
+| DELETE | `/:id`         | Delete contact submission    | Protected (Admin) |
+| POST   | `/:id/reply`   | Reply to contact submission  | Protected (Admin) |
 | DELETE | `/:id`               | Delete news                   | Protected (Admin) |
 | PATCH  | `/:id/toggle-status` | Activate/deactivate news      | Protected (Admin) |
 
@@ -429,23 +449,42 @@ npm test -- --watch  # Run tests in watch mode
 
 - Rate limiting recommended for production
 - HTTPS enforced in production
+- Contact form replies
 - Secure headers with Helmet middleware
 
 ## Email Configuration
+Automated Data Cleanup
 
-**Supported Providers**
+**Cleanup Scheduler** (`utils/cleanup.js`)
 
-- Gmail (requires app-specific password)
-- Mailgun
-- SendGrid
-- Any SMTP server
+- Runs daily at midnight
+- Deletes expired notifications (7 days)
+- Deactivates expired news (30 days)
+- Archives expired contacts (90 days)
+- Automatic cleanup on server startup
 
-**Email Types**
+**Expiry Configuration**
 
-- Email verification (registration)
-- Password reset
-- Application notifications
+- Notifications: 7 days from creation
+- News: 30 days from creation (configurable)
+- Contacts: 90 days from submission
 
+## Logging & Monitoring
+
+**Logger Utility**
+
+- Request logging (method, path, duration)
+- Error logging with stack traces
+- Database operation tracking
+- Cleanup operation logging
+
+**Production Recommendations**
+
+- Implement error tracking (Sentry)
+- Set up application monitoring (New Relic, DataDog)
+- Enable request logging
+- Monitor database performance
+- Track cleanup job execution
 **Template System**
 Plain text templates with dynamic links to frontend.
 

@@ -6,6 +6,7 @@ import {
   updateApplicationStatus,
   withdrawApplication,
   getApplicationById,
+  getEmployerApplications,
 } from "../controllers/application.controller.js";
 import Application from "../models/application.model.js";
 import Job from "../models/job.model.js";
@@ -556,6 +557,62 @@ describe("Application Routes", () => {
       expect(res.statusCode).toBe(403);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe("not authorized to view this application");
+    });
+  });
+
+  describe("GET /api/applications/employer/all", () => {
+    beforeEach(async () => {
+      await Application.create({
+        job: testJob._id,
+        applicant: testLearner._id,
+        status: "applied",
+      });
+      
+      const anotherJob = await Job.create({
+        createdBy: testEmployer._id,
+        company: "Another Corp",
+        title: "Designer",
+        description: "Design position",
+        employmentType: "part-time",
+        status: "active",
+      });
+
+      const anotherLearner = await User.create({
+        name: "Another Learner",
+        email: "another2@example.com",
+        password: "password123",
+        role: "learner",
+      });
+
+      await Application.create({
+        job: anotherJob._id,
+        applicant: anotherLearner._id,
+        status: "reviewing",
+      });
+    });
+
+    it("should get all employer applications", async () => {
+      const req = mockRequest({}, {}, { id: testEmployer._id.toString() }, {});
+      const res = mockResponse();
+
+      await getEmployerApplications(req, res);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.length).toBe(2);
+      expect(res.body.pagination).toBeDefined();
+    });
+
+    it("should filter employer applications by status", async () => {
+      const req = mockRequest({}, {}, { id: testEmployer._id.toString() }, { status: "applied" });
+      const res = mockResponse();
+
+      await getEmployerApplications(req, res);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.length).toBe(1);
+      expect(res.body.data[0].status).toBe("applied");
     });
   });
 });

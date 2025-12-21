@@ -4,6 +4,7 @@ const AdminDashboardPage = lazy(() => import("@/pages/admin/DashboardPage"));
 const AdminNewsPage = lazy(() => import("@/pages/admin/NewsPage"));
 const AdminProgramsPage = lazy(() => import("@/pages/admin/ProgramsPage"));
 const AdminUsersPage = lazy(() => import("@/pages/admin/UsersPage"));
+const AdminContactPage = lazy(() => import("@/pages/admin/ContactPage"));
 
 export const adminRoutes = [
     {
@@ -25,6 +26,10 @@ export const adminRoutes = [
     {
         path: "/admin/users",
         element: <AdminUsersPage />,
+    },
+    {
+        path: "/admin/contacts",
+        element: <AdminContactPage />,
     },
 ];
 
