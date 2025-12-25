@@ -3,6 +3,22 @@ import User from "../models/user.model.js";
 import { syncProfileSummary } from "./matching.controller.js";
 import { validationResult } from "express-validator";
 
+const allowedUpdates = [
+  "headline",
+  "summary",
+  "phone",
+  "location",
+  "portfolio",
+  "skills",
+  "experience",
+  "education",
+  "languages",
+  "profileCompletion",
+  "isPublic",
+  "certifications",
+  "preferences",
+];
+
 export const createProfile = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -22,6 +38,13 @@ export const createProfile = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "User not found" });
+    }
+
+    if (!["learner", "employer"].includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid user role for profile creation",
+      });
     }
 
     const profile = await Profile.create({
@@ -89,19 +112,9 @@ export const getMyProfile = async (req, res) => {
     );
 
     if (!profile) {
-      if (user.role === "learner") {
-        return res
-          .status(404)
-          .json({ success: false, message: "Profile not found" });
-      }
-      profile = await Profile.create({
-        user: req.user.id,
-        profileType: user.role,
-      });
-      profile = await Profile.findById(profile._id).populate(
-        "user",
-        "name email role"
-      );
+      return res
+        .status(404)
+        .json({ success: false, message: "Profile not found" });
     }
 
     res.status(200).json({
@@ -159,23 +172,41 @@ export const updateProfile = async (req, res) => {
         .json({ success: false, message: "Profile not found" });
     }
 
-    const allowedUpdates = [
-      "headline",
-      "summary",
-      "location",
-      "phone",
-      "languages",
-      "portfolio",
-      "preferences",
-      "companyDetails",
-      "isPublic",
-    ];
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
 
-    Object.keys(req.body).forEach((key) => {
-      if (allowedUpdates.includes(key)) {
-        profile[key] = req.body[key];
-      }
-    });
+    if (user.role === "employer") {
+      const employerData = req.body;
+      profile.companyDetails = {
+        name: employerData.companyName || profile.companyDetails?.name,
+        industry: employerData.industry || profile.companyDetails?.industry,
+        size: employerData.companySize || profile.companyDetails?.size,
+        website: employerData.website || profile.companyDetails?.website,
+        description:
+          employerData.companyDescription ||
+          profile.companyDetails?.description,
+      };
+      profile.location = {
+        city: employerData.locationCity || profile.location?.city,
+        state: employerData.locationState || profile.location?.state,
+        country: employerData.locationCountry || profile.location?.country,
+      };
+      profile.phone = employerData.contactPhone || profile.phone;
+      profile.portfolio = {
+        ...profile.portfolio,
+        linkedin: employerData.linkedin || profile.portfolio?.linkedin,
+      };
+    } else {
+      Object.keys(req.body).forEach((key) => {
+        if (allowedUpdates.includes(key)) {
+          profile[key] = req.body[key];
+        }
+      });
+    }
 
     await profile.save();
     await syncProfileSummary(req.user.id);
@@ -215,6 +246,13 @@ export const deleteProfile = async (req, res) => {
 
 export const searchProfiles = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can search profiles",
+      });
+    }
+
     const {
       skills,
       location,
@@ -273,6 +311,14 @@ export const addSkill = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user || user.role !== "learner") {
+      return res.status(403).json({
+        success: false,
+        message: "Only learners can manage skills",
+      });
     }
 
     const profile = await Profile.findOne({ user: req.user.id });
@@ -372,6 +418,14 @@ export const addExperience = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user || user.role !== "learner") {
+      return res.status(403).json({
+        success: false,
+        message: "Only learners can manage experience",
+      });
     }
 
     const profile = await Profile.findOne({ user: req.user.id });

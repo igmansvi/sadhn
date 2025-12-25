@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ export default function ArticlesPage() {
         page: 1,
         limit: 10,
     });
+    const [searchTerm, setSearchTerm] = useState("");
 
     const fetchArticles = async (params) => {
         setLoading(true);
@@ -50,19 +52,18 @@ export default function ArticlesPage() {
 
     useEffect(() => {
         fetchArticles(filters);
-    }, [filters.status, filters.page]);
+    }, [filters.status, filters.page, filters.search]);
 
     const debouncedSearch = useCallback(
         debounce((value) => {
             setFilters((prev) => ({ ...prev, search: value, page: 1 }));
-            fetchArticles({ ...filters, search: value, page: 1 });
         }, 500),
-        [filters]
+        []
     );
 
     const handleSearchChange = (e) => {
         const value = e.target.value;
-        setFilters((prev) => ({ ...prev, search: value }));
+        setSearchTerm(value);
         debouncedSearch(value);
     };
 
@@ -83,59 +84,76 @@ export default function ArticlesPage() {
 
     const clearFilters = () => {
         setFilters({ search: "", status: "", page: 1, limit: 10 });
-        fetchArticles({ page: 1, limit: 10 });
+        setSearchTerm("");
     };
 
     const hasActiveFilters = filters.search || filters.status;
 
     return (
         <div className="container mx-auto p-6">
-            <div className="flex items-center justify-between mb-6">
+            <motion.div
+                className="flex items-center justify-between mb-6"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
                 <div>
-                    <h1 className="text-2xl font-bold">My Articles</h1>
-                    <p className="text-muted-foreground">Share insights and industry knowledge</p>
+                    <h1 className="text-3xl font-bold">
+                        My <span className="gradient-text">Articles</span>
+                    </h1>
+                    <p className="text-muted-foreground mt-1">Share insights and industry knowledge</p>
                 </div>
-                <Button asChild>
-                    <Link to="/employer/articles/new">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Write Article
-                    </Link>
-                </Button>
-            </div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button className="gradient-primary" asChild>
+                        <Link to="/employer/articles/new">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Write Article
+                        </Link>
+                    </Button>
+                </motion.div>
+            </motion.div>
 
-            <Card className="mb-6">
-                <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search articles..."
-                                value={filters.search}
-                                onChange={handleSearchChange}
-                                className="pl-9"
-                            />
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+            >
+                <Card className="mb-6 shadow-lg">
+                    <CardContent className="p-4">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search articles..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                    className="pl-9"
+                                />
+                            </div>
+                            <Select
+                                value={filters.status || "all"}
+                                onValueChange={(value) => setFilters((prev) => ({ ...prev, status: value === "all" ? "" : value, page: 1 }))}
+                            >
+                                <SelectTrigger className="w-full md:w-48">
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Status</SelectItem>
+                                    <SelectItem value="published">Published</SelectItem>
+                                    <SelectItem value="draft">Draft</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {hasActiveFilters && (
+                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                    <Button variant="ghost" size="icon" onClick={clearFilters}>
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </motion.div>
+                            )}
                         </div>
-                        <Select
-                            value={filters.status || "all"}
-                            onValueChange={(value) => setFilters((prev) => ({ ...prev, status: value === "all" ? "" : value, page: 1 }))}
-                        >
-                            <SelectTrigger className="w-full md:w-48">
-                                <SelectValue placeholder="Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Status</SelectItem>
-                                <SelectItem value="published">Published</SelectItem>
-                                <SelectItem value="draft">Draft</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        {hasActiveFilters && (
-                            <Button variant="ghost" size="icon" onClick={clearFilters}>
-                                <X className="h-4 w-4" />
-                            </Button>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </motion.div>
 
             {loading ? (
                 <div className="space-y-4">
@@ -146,51 +164,67 @@ export default function ArticlesPage() {
             ) : articles.length > 0 ? (
                 <>
                     <div className="space-y-4">
-                        {articles.map((article) => (
-                            <Card key={article._id}>
-                                <CardContent className="p-6">
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <Link
-                                                    to={`/employer/articles/${article._id}/edit`}
-                                                    className="font-semibold text-lg hover:text-primary truncate"
-                                                >
-                                                    {article.title}
-                                                </Link>
-                                                <Badge className={STATUS_COLORS[article.status]}>{article.status}</Badge>
-                                            </div>
-                                            {article.summary && (
-                                                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{article.summary}</p>
-                                            )}
-                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                                                <span>{formatDate(article.createdAt)}</span>
-                                                {article.tags?.length > 0 && (
-                                                    <div className="flex gap-1">
-                                                        {article.tags.slice(0, 3).map((tag, idx) => (
-                                                            <Badge key={idx} variant="outline" className="text-xs">{tag}</Badge>
-                                                        ))}
+                        {articles.map((article, index) => (
+                            <motion.div
+                                key={article._id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                            >
+                                <motion.div
+                                    whileHover={{ scale: 1.01, y: -2 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border hover:border-primary/50 bg-linear-to-br from-card to-muted/10">
+                                        <CardContent className="p-6">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <Link
+                                                            to={`/employer/articles/${article._id}/edit`}
+                                                            className="font-semibold text-lg hover:text-primary truncate"
+                                                        >
+                                                            {article.title}
+                                                        </Link>
+                                                        <Badge className={STATUS_COLORS[article.status]}>{article.status}</Badge>
                                                     </div>
-                                                )}
+                                                    {article.summary && (
+                                                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{article.summary}</p>
+                                                    )}
+                                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                                                        <span>{formatDate(article.createdAt)}</span>
+                                                        {article.tags?.length > 0 && (
+                                                            <div className="flex gap-1">
+                                                                {article.tags.slice(0, 3).map((tag, idx) => (
+                                                                    <Badge key={idx} variant="outline" className="text-xs">{tag}</Badge>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button variant="outline" size="sm" asChild>
+                                                            <Link to={`/employer/articles/${article._id}/edit`}>
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Link>
+                                                        </Button>
+                                                    </motion.div>
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => setDeleteDialog({ open: true, article })}
+                                                        >
+                                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                                        </Button>
+                                                    </motion.div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Button variant="outline" size="sm" asChild>
-                                                <Link to={`/employer/articles/${article._id}/edit`}>
-                                                    <Pencil className="h-4 w-4" />
-                                                </Link>
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setDeleteDialog({ open: true, article })}
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            </motion.div>
                         ))}
                     </div>
                     <Pagination

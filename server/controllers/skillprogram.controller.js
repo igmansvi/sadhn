@@ -1,14 +1,18 @@
-
-
 import SkillProgram from "../models/skillprogram.model.js";
 import { validationResult } from "express-validator";
-
 
 export const createSkillProgram = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can create skill programs",
+      });
     }
 
     const program = await SkillProgram.create(req.body);
@@ -26,7 +30,6 @@ export const createSkillProgram = async (req, res) => {
     });
   }
 };
-
 
 export const getSkillPrograms = async (req, res) => {
   try {
@@ -77,7 +80,6 @@ export const getSkillPrograms = async (req, res) => {
   }
 };
 
-
 export const getSkillProgramById = async (req, res) => {
   try {
     const program = await SkillProgram.findById(req.params.id);
@@ -102,9 +104,15 @@ export const getSkillProgramById = async (req, res) => {
   }
 };
 
-
 export const updateSkillProgram = async (req, res) => {
   try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can update skill programs",
+      });
+    }
+
     const program = await SkillProgram.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -135,9 +143,15 @@ export const updateSkillProgram = async (req, res) => {
   }
 };
 
-
 export const deleteSkillProgram = async (req, res) => {
   try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can delete skill programs",
+      });
+    }
+
     const program = await SkillProgram.findByIdAndDelete(req.params.id);
 
     if (!program) {
@@ -159,7 +173,6 @@ export const deleteSkillProgram = async (req, res) => {
     });
   }
 };
-
 
 export const searchSkillPrograms = async (req, res) => {
   try {
@@ -232,7 +245,6 @@ export const searchSkillPrograms = async (req, res) => {
     });
   }
 };
-
 
 export const getSkillProgramsBySkills = async (req, res) => {
   try {

@@ -1,5 +1,3 @@
-
-
 import dotenv from "dotenv";
 import path from "path";
 
@@ -17,15 +15,15 @@ export const config = {
   PORT: process.env.PORT || 5000,
 
   MONGODB_URI: process.env.MONGODB_URI,
+  TEST_URI: process.env.LOCAL_MONGODB_URI,
 
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRE: process.env.JWT_EXPIRE || "7d",
 
   CLIENT_URL: process.env.CLIENT_URL,
+  NGINX_URL: process.env.NGINX_URL,
 
-  EMAIL_HOST: process.env.EMAIL_HOST,
-  EMAIL_PORT: process.env.EMAIL_PORT,
-  EMAIL_USER: process.env.EMAIL_USER,
-  EMAIL_PASS: process.env.EMAIL_PASS,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
   EMAIL_FROM: process.env.EMAIL_FROM,
+  EMAIL_TO: process.env.EMAIL_TO,
 };

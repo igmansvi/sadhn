@@ -10,6 +10,13 @@ export const applyToJob = async (req, res) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
+    if (!["learner", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only learners and admins can apply to jobs",
+      });
+    }
+
     const { jobId, coverLetter, resume } = req.body;
 
     const job = await Job.findById(jobId);
@@ -70,6 +77,13 @@ export const applyToJob = async (req, res) => {
 
 export const getMyApplications = async (req, res) => {
   try {
+    if (!["learner", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only learners and admins can view their applications",
+      });
+    }
+
     const {
       status,
       page = 1,
@@ -187,6 +201,13 @@ export const getEmployerApplications = async (req, res) => {
 
 export const getJobApplications = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can view job applications",
+      });
+    }
+
     const { jobId } = req.params;
     const {
       status,
@@ -269,6 +290,13 @@ export const getJobApplications = async (req, res) => {
 
 export const updateApplicationStatus = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can update application status",
+      });
+    }
+
     const { id } = req.params;
     const { status, recruiterNotes, interviewDate } = req.body;
 
@@ -311,6 +339,13 @@ export const updateApplicationStatus = async (req, res) => {
 
 export const withdrawApplication = async (req, res) => {
   try {
+    if (!["learner", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only learners and admins can withdraw applications",
+      });
+    }
+
     const { id } = req.params;
 
     const application = await Application.findById(id);

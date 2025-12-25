@@ -11,7 +11,7 @@ const profileSummarySchema = new mongoose.Schema(
     },
     profileType: {
       type: String,
-      enum: ["learner", "employer"],
+      enum: ["learner"],
       required: true,
     },
     skills: [

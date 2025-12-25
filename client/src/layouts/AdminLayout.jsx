@@ -14,6 +14,7 @@ import {
     Menu,
     X,
     Users,
+    MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ const adminNavItems = [
     { path: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { path: "/admin/news", label: "News", icon: Newspaper },
     { path: "/admin/programs", label: "Skill Programs", icon: BookOpen },
+    { path: "/admin/contacts", label: "Contacts", icon: MessageSquare },
     { path: "/admin/users", label: "Users", icon: Users },
 ];
 

@@ -1,33 +1,39 @@
-import api from "../api";
+import axios from "@/lib/api";
 
 export const newsService = {
-  getNews: async (filters = {}) => {
-    const response = await api.get("/news", { params: filters });
+  getNews: async (params = {}) => {
+    const response = await axios.get("/news", { 
+      params: { ...params, includeInactive: 'true' } 
+    });
     return response.data;
+  },
+
+  getAllNews: async (params = {}) => {
+    return await axios.get("/news", { params });
   },
 
   getNewsById: async (id) => {
-    const response = await api.get(`/news/${id}`);
+    const response = await axios.get(`/news/${id}`);
     return response.data;
   },
 
-  createNews: async (newsData) => {
-    const response = await api.post("/news", newsData);
+  createNews: async (data) => {
+    const response = await axios.post("/news", data);
     return response.data;
   },
 
-  updateNews: async (id, newsData) => {
-    const response = await api.put(`/news/${id}`, newsData);
+  updateNews: async (id, data) => {
+    const response = await axios.put(`/news/${id}`, data);
     return response.data;
   },
 
   deleteNews: async (id) => {
-    const response = await api.delete(`/news/${id}`);
+    const response = await axios.delete(`/news/${id}`);
     return response.data;
   },
 
   deactivateNews: async (id) => {
-    const response = await api.patch(`/news/${id}/deactivate`);
+    const response = await axios.patch(`/news/${id}/deactivate`);
     return response.data;
   },
 };

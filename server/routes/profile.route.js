@@ -1,5 +1,3 @@
-
-
 import express from "express";
 import { body } from "express-validator";
 import {
@@ -43,6 +41,21 @@ profileRouter.post(
       .isLength({ max: 2000 })
       .withMessage("Summary must be less than 2000 characters"),
     body("phone").optional().trim(),
+    body("companyName").optional().trim(),
+    body("companyDescription").optional().trim().isLength({ max: 2000 }),
+    body("industry").optional().trim(),
+    body("companySize").optional().trim(),
+    body("foundedYear")
+      .optional()
+      .isInt({ min: 1800, max: new Date().getFullYear() }),
+    body("website").optional().isURL(),
+    body("locationCity").optional().trim(),
+    body("locationState").optional().trim(),
+    body("locationCountry").optional().trim(),
+    body("contactEmail").optional().isEmail(),
+    body("contactPhone").optional().trim(),
+    body("linkedin").optional().isURL(),
+    body("twitter").optional().isURL(),
   ],
   createProfile
 );
@@ -71,6 +84,21 @@ profileRouter.put(
       .trim()
       .isLength({ max: 2000 })
       .withMessage("Summary must be less than 2000 characters"),
+    body("companyName").optional().trim(),
+    body("companyDescription").optional().trim().isLength({ max: 2000 }),
+    body("industry").optional().trim(),
+    body("companySize").optional().trim(),
+    body("foundedYear")
+      .optional()
+      .isInt({ min: 1800, max: new Date().getFullYear() }),
+    body("website").optional().isURL(),
+    body("locationCity").optional().trim(),
+    body("locationState").optional().trim(),
+    body("locationCountry").optional().trim(),
+    body("contactEmail").optional().isEmail(),
+    body("contactPhone").optional().trim(),
+    body("linkedin").optional().isURL(),
+    body("twitter").optional().isURL(),
   ],
   updateProfile
 );

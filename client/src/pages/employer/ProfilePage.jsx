@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,14 +9,24 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { profileService } from "@/lib/services/profileService";
-import { Building2, Globe, MapPin, Phone, Mail, Linkedin, Save } from "lucide-react";
+import { authService } from "@/lib/services/authService";
+import { logout } from "@/store/slices/authSlice";
+import { Building2, Globe, MapPin, Phone, Mail, Linkedin, Save, Trash2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { user } = useSelector((state) => state.auth);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [sendingVerification, setSendingVerification] = useState(false);
     const [profile, setProfile] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [confirmText, setConfirmText] = useState("");
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -26,14 +38,40 @@ export default function ProfilePage() {
         setLoading(true);
         try {
             const response = await profileService.getMyProfile();
-            setProfile(response.data);
-            reset(response.data);
+            const profileData = response.profile;
+            setProfile(profileData);
+            const flatData = {
+                companyName: profileData?.companyDetails?.name || '',
+                companyDescription: profileData?.companyDetails?.description || '',
+                industry: profileData?.companyDetails?.industry || '',
+                companySize: profileData?.companyDetails?.size || '',
+                website: profileData?.companyDetails?.website || '',
+                locationCity: profileData?.location?.city || '',
+                locationState: profileData?.location?.state || '',
+                locationCountry: profileData?.location?.country || '',
+                contactPhone: profileData?.phone || '',
+                linkedin: profileData?.portfolio?.linkedin || '',
+                twitter: profileData?.portfolio?.twitter || '',
+            };
+            reset(flatData);
         } catch (err) {
             if (err.response?.status !== 404) {
                 toast.error("Failed to load profile");
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSendVerificationEmail = async () => {
+        setSendingVerification(true);
+        try {
+            await authService.sendVerificationEmail();
+            toast.success("Verification email sent! Please check your inbox.");
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to send verification email");
+        } finally {
+            setSendingVerification(false);
         }
     };
 
@@ -66,7 +104,7 @@ export default function ProfilePage() {
                 ? await profileService.updateProfile(payload)
                 : await profileService.createProfile(payload);
 
-            setProfile(response.data);
+            setProfile(response.profile);
             toast.success("Profile updated");
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to save profile");
@@ -86,6 +124,27 @@ export default function ProfilePage() {
 
     return (
         <div className="container mx-auto p-6 max-w-4xl">
+            {!user?.isEmailVerified && (
+                <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <AlertCircle className="h-5 w-5 text-yellow-600" />
+                        <div>
+                            <p className="font-medium text-yellow-800">Email not verified</p>
+                            <p className="text-sm text-yellow-700">Please verify your email to access all features.</p>
+                        </div>
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSendVerificationEmail}
+                        disabled={sendingVerification}
+                        className="border-yellow-400 text-yellow-800 hover:bg-yellow-100"
+                    >
+                        <Mail className="h-4 w-4 mr-2" />
+                        {sendingVerification ? "Sending..." : "Send Verification Email"}
+                    </Button>
+                </div>
+            )}
             <div className="mb-6">
                 <h1 className="text-2xl font-bold">Company Profile</h1>
                 <p className="text-muted-foreground">Manage your company information</p>
@@ -102,7 +161,7 @@ export default function ProfilePage() {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         <div className="grid md:grid-cols-2 gap-4">
                             <div className="space-y-2 md:col-span-2">
-                                <Label htmlFor="companyName">Company Name *</Label>
+                                <Label htmlFor="companyName">Company Name</Label>
                                 <Input
                                     id="companyName"
                                     {...register("companyName", { required: "Company name is required" })}
@@ -147,11 +206,19 @@ export default function ProfilePage() {
                                     <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         id="website"
-                                        {...register("website")}
+                                        {...register("website", {
+                                            pattern: {
+                                                value: /^https?:\/\/.+/,
+                                                message: "Please enter a valid URL starting with http:// or https://",
+                                            },
+                                        })}
                                         className="pl-9"
                                         placeholder="https://yourcompany.com"
                                     />
                                 </div>
+                                {errors.website && (
+                                    <p className="text-sm text-destructive">{errors.website.message}</p>
+                                )}
                             </div>
                         </div>
 
@@ -212,11 +279,12 @@ export default function ProfilePage() {
                                         <Input
                                             id="contactEmail"
                                             type="email"
-                                            {...register("contactEmail")}
+                                            {...register("contactEmail", { pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Please enter a valid email address" } })}
                                             className="pl-9"
                                             defaultValue={profile?.contact?.email}
                                         />
                                     </div>
+                                    {errors.contactEmail && <p className="text-sm text-red-500">{errors.contactEmail.message}</p>}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="contactPhone">Phone</Label>
@@ -255,10 +323,11 @@ export default function ProfilePage() {
                                     <Label htmlFor="twitter">Twitter</Label>
                                     <Input
                                         id="twitter"
-                                        {...register("twitter")}
+                                        {...register("twitter", { pattern: { value: /^https?:\/\/.+/, message: "Please enter a valid URL starting with http:// or https://" } })}
                                         placeholder="Twitter profile URL"
                                         defaultValue={profile?.socialLinks?.twitter}
                                     />
+                                    {errors.twitter && <p className="text-sm text-red-500">{errors.twitter.message}</p>}
                                 </div>
                             </div>
                         </div>
@@ -272,6 +341,69 @@ export default function ProfilePage() {
                     </form>
                 </CardContent>
             </Card>
+
+            <Card className="mt-6 border-destructive/50">
+                <CardHeader>
+                    <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="p-4 border border-destructive/30 rounded-lg bg-destructive/5">
+                        <h4 className="font-medium text-destructive mb-2">Delete Account</h4>
+                        <p className="text-sm text-muted-foreground mb-4">
+                            Once you delete your account, there is no going back. This will permanently delete your profile,
+                            job postings, articles, and all associated data.
+                        </p>
+                        <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Account
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="text-destructive">Delete Account</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be undone. This will permanently delete your account, all job postings, articles, and associated data.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <p className="text-sm">
+                            To confirm, type <span className="font-bold">DELETE</span> below:
+                        </p>
+                        <Input
+                            value={confirmText}
+                            onChange={(e) => setConfirmText(e.target.value)}
+                            placeholder="Type DELETE to confirm"
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                        <Button
+                            variant="destructive"
+                            onClick={async () => {
+                                if (confirmText !== "DELETE") return;
+                                setDeleting(true);
+                                try {
+                                    await authService.deleteAccount();
+                                    toast.success("Account deleted successfully");
+                                    dispatch(logout());
+                                    navigate("/");
+                                } catch (err) {
+                                    toast.error(err.response?.data?.message || "Failed to delete account");
+                                } finally {
+                                    setDeleting(false);
+                                }
+                            }}
+                            disabled={confirmText !== "DELETE" || deleting}
+                        >
+                            {deleting ? "Deleting..." : "Delete Account"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

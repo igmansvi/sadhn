@@ -8,6 +8,13 @@ export const createArticle = async (req, res) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can create articles",
+      });
+    }
+
     const articleData = {
       ...req.body,
       author: req.user.id,
@@ -115,6 +122,13 @@ export const getArticleById = async (req, res) => {
 
 export const getMyArticles = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can view their articles",
+      });
+    }
+
     const {
       status,
       page = 1,
@@ -157,6 +171,13 @@ export const getMyArticles = async (req, res) => {
 
 export const updateArticle = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can update articles",
+      });
+    }
+
     const article = await Article.findById(req.params.id);
 
     if (!article) {
@@ -198,6 +219,13 @@ export const updateArticle = async (req, res) => {
 
 export const deleteArticle = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can delete articles",
+      });
+    }
+
     const article = await Article.findById(req.params.id);
 
     if (!article) {

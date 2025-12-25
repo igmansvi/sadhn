@@ -1,12 +1,12 @@
 {
   "name": "sadhn-server",
+  "private": true,
   "version": "1.0.0",
-  "description": "Skills and Development Hub Network - Backend API",
+  "description": "Skills and Development Hub Network - Server API",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
-    "dev": "nodemon index.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [
     "mongodb",
@@ -25,10 +25,10 @@
     "express-validator": "^7.3.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
-    "nodemailer": "^7.0.10"
+    "resend": "^6.6.0",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "jest": "^30.2.0",
     "nodemon": "^3.1.10"
   }
 }

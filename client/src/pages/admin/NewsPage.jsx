@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,7 @@ import EmptyState from "@/components/shared/EmptyState";
 import { newsService } from "@/lib/services/newsService";
 import { NEWS_CATEGORIES } from "@/lib/constants";
 import { debounce, formatDate } from "@/lib/utils";
-import { Search, Plus, Newspaper, Pencil, Trash2, X } from "lucide-react";
+import { Search, Plus, Newspaper, Pencil, Trash2, X, Ban, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const PRIORITY_COLORS = {
@@ -30,12 +31,14 @@ export default function NewsPage() {
     const [deleteDialog, setDeleteDialog] = useState({ open: false, item: null });
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [toggling, setToggling] = useState(null);
     const [filters, setFilters] = useState({
         search: "",
         category: "",
         page: 1,
         limit: 10,
     });
+    const [searchTerm, setSearchTerm] = useState("");
     const [formData, setFormData] = useState({
         title: "",
         content: "",
@@ -62,19 +65,18 @@ export default function NewsPage() {
 
     useEffect(() => {
         fetchNews(filters);
-    }, [filters.category, filters.page]);
+    }, [filters.category, filters.page, filters.search]);
 
     const debouncedSearch = useCallback(
         debounce((value) => {
             setFilters((prev) => ({ ...prev, search: value, page: 1 }));
-            fetchNews({ ...filters, search: value, page: 1 });
         }, 500),
-        [filters]
+        []
     );
 
     const handleSearchChange = (e) => {
         const value = e.target.value;
-        setFilters((prev) => ({ ...prev, search: value }));
+        setSearchTerm(value);
         debouncedSearch(value);
     };
 
@@ -100,8 +102,8 @@ export default function NewsPage() {
     };
 
     const handleSave = async () => {
-        if (!formData.title || !formData.content) {
-            toast.error("Title and content are required");
+        if (!formData.title || !formData.content || !formData.category) {
+            toast.error("Title, content, and category are required");
             return;
         }
         setSaving(true);
@@ -137,60 +139,93 @@ export default function NewsPage() {
         }
     };
 
+    const handleToggleActive = async (item) => {
+        setToggling(item._id);
+        try {
+            if (item.isActive === false) {
+                await newsService.updateNews(item._id, { isActive: true });
+                toast.success("News activated");
+            } else {
+                await newsService.deactivateNews(item._id);
+                toast.success("News deactivated");
+            }
+            fetchNews(filters);
+        } catch (err) {
+            toast.error("Failed to update status");
+        } finally {
+            setToggling(null);
+        }
+    };
+
     const clearFilters = () => {
         setFilters({ search: "", category: "", page: 1, limit: 10 });
-        fetchNews({ page: 1, limit: 10 });
+        setSearchTerm("");
     };
 
     const hasActiveFilters = filters.search || filters.category;
 
     return (
         <div className="container mx-auto p-6">
-            <div className="flex items-center justify-between mb-6">
+            <motion.div
+                className="flex items-center justify-between mb-6"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
                 <div>
-                    <h1 className="text-2xl font-bold">News & Announcements</h1>
-                    <p className="text-muted-foreground">Manage platform news and announcements</p>
+                    <h1 className="text-3xl font-bold">
+                        News & <span className="gradient-text">Announcements</span>
+                    </h1>
+                    <p className="text-muted-foreground mt-1">Manage platform news and announcements</p>
                 </div>
-                <Button onClick={() => openFormDialog()}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add News
-                </Button>
-            </div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button className="gradient-primary" onClick={() => openFormDialog()}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add News
+                    </Button>
+                </motion.div>
+            </motion.div>
 
-            <Card className="mb-6">
-                <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search news..."
-                                value={filters.search}
-                                onChange={handleSearchChange}
-                                className="pl-9"
-                            />
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+            >
+                <Card className="mb-6 shadow-lg">
+                    <CardContent className="p-4">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search news..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                    className="pl-9"
+                                />
+                            </div>
+                            <Select
+                                value={filters.category || "all"}
+                                onValueChange={(value) => setFilters((prev) => ({ ...prev, category: value === "all" ? "" : value, page: 1 }))}
+                            >
+                                <SelectTrigger className="w-full md:w-48">
+                                    <SelectValue placeholder="Category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Categories</SelectItem>
+                                    {NEWS_CATEGORIES.map((cat) => (
+                                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {hasActiveFilters && (
+                                <Button variant="ghost" size="icon" onClick={clearFilters}>
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            )}
                         </div>
-                        <Select
-                            value={filters.category || "all"}
-                            onValueChange={(value) => setFilters((prev) => ({ ...prev, category: value === "all" ? "" : value, page: 1 }))}
-                        >
-                            <SelectTrigger className="w-full md:w-48">
-                                <SelectValue placeholder="Category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Categories</SelectItem>
-                                {NEWS_CATEGORIES.map((cat) => (
-                                    <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        {hasActiveFilters && (
-                            <Button variant="ghost" size="icon" onClick={clearFilters}>
-                                <X className="h-4 w-4" />
-                            </Button>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </motion.div>
 
             {loading ? (
                 <div className="space-y-4">
@@ -201,41 +236,71 @@ export default function NewsPage() {
             ) : news.length > 0 ? (
                 <>
                     <div className="space-y-4">
-                        {news.map((item) => (
-                            <Card key={item._id}>
-                                <CardContent className="p-6">
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <h3 className="font-semibold truncate">{item.title}</h3>
-                                                <Badge variant="outline">{item.category}</Badge>
-                                                <Badge className={PRIORITY_COLORS[item.priority || "medium"]}>
-                                                    {item.priority || "medium"}
-                                                </Badge>
-                                                {item.isActive === false && (
-                                                    <Badge variant="secondary">Inactive</Badge>
-                                                )}
+                        {news.map((item, index) => (
+                            <motion.div
+                                key={item._id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                            >
+                                <motion.div
+                                    whileHover={{ scale: 1.01, y: -2 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border hover:border-primary/50 bg-linear-to-br from-card to-muted/10">
+                                        <CardContent className="p-6">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <h3 className="font-semibold truncate">{item.title}</h3>
+                                                        <Badge variant="outline">{item.category}</Badge>
+                                                        <Badge className={PRIORITY_COLORS[item.priority || "medium"]}>
+                                                            {item.priority || "medium"}
+                                                        </Badge>
+                                                        {item.isActive === false && (
+                                                            <Badge variant="secondary">Inactive</Badge>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                                                        {item.content}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">{formatDate(item.createdAt)}</p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button variant="outline" size="sm" onClick={() => openFormDialog(item)}>
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                    </motion.div>
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleToggleActive(item)}
+                                                            disabled={toggling === item._id}
+                                                        >
+                                                            {item.isActive === false ? (
+                                                                <CheckCircle className="h-4 w-4 text-green-600" />
+                                                            ) : (
+                                                                <Ban className="h-4 w-4 text-orange-600" />
+                                                            )}
+                                                        </Button>
+                                                    </motion.div>
+                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => setDeleteDialog({ open: true, item })}
+                                                        >
+                                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                                        </Button>
+                                                    </motion.div>
+                                                </div>
                                             </div>
-                                            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                                                {item.content}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground">{formatDate(item.createdAt)}</p>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Button variant="outline" size="sm" onClick={() => openFormDialog(item)}>
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setDeleteDialog({ open: true, item })}
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            </motion.div>
                         ))}
                     </div>
                     <Pagination
@@ -284,7 +349,7 @@ export default function NewsPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Category</Label>
+                                <Label>Category *</Label>
                                 <Select
                                     value={formData.category}
                                     onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value }))}
