@@ -13,6 +13,7 @@ import {
     Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import NotificationBell from "@/components/common/NotificationUpdates";
 
 export default function LearnerLayout() {
     const { user } = useSelector((state) => state.auth);
@@ -65,9 +66,7 @@ export default function LearnerLayout() {
                     </nav>
 
                     <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="icon">
-                            <Bell className="h-5 w-5" />
-                        </Button>
+                        <NotificationBell />
                         <Avatar className="h-8 w-8 cursor-pointer">
                             <AvatarFallback name={user?.name} />
                         </Avatar>

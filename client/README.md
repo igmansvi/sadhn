@@ -1,73 +1,175 @@
-# Full-Stack Project - Frontend
+# SADHN Client - Frontend Application
 
-React + Vite + TailwindCSS + shadcn/ui
+Modern React-based frontend for the Skills and Development Hub Network platform. A comprehensive job portal and skill development platform supporting three distinct user roles: Learners, Employers, and Administrators.
 
-## 📋 Project Overview
+## Technology Stack
 
-A professional skill enhancement and job seeking platform with three distinct user roles:
+**Core Framework**
 
-- **Learner**: Browse jobs, apply, manage applications, enroll skill programs
-- **Employer**: Post jobs, manage applications, write articles
-- **Admin**: Manage and create news/announcements, platform administration
+- React 18 with Vite (fast bundler)
+- React Router v6 (client-side routing)
+- Redux Toolkit (global state management)
 
-## 🎨 Tech Stack
+**UI & Styling**
 
-- **Framework**: React 18 + Vite
-- **UI Library**: shadcn/ui (Neutral, Minimal, Professional)
-- **Styling**: TailwindCSS
-- **State Management**: Redux Toolkit
-- **Routing**: React Router v6
-- **Form Handling**: React Hook Form
-- **HTTP Client**: Axios
-- **Icons**: Lucide React
-- **Notifications**: Sonner
+- TailwindCSS v4 (utility-first CSS framework)
+- shadcn/ui (accessible component library)
+- Lucide React (icon library)
+- Framer Motion (animations)
 
-## ✅ Features Implemented
+**Data & Forms**
 
-### Authentication
+- Axios (HTTP client with interceptors)
+- React Hook Form (form state management)
+- Zod (schema validation)
 
-- Login with email/password
-- Registration with role selection (Learner/Employer)
-- Forgot password & reset password
-- Email verification
-- Role-based access control
-- Protected routes
+**Real-time & Notifications**
 
-### Learner Features
+- Socket.IO Client (real-time communication)
+- Sonner (toast notifications)
 
-- Dashboard with stats and recommendations
-- Complete profile management (skills, experience, education, certifications)
-- Job browsing with advanced filters (type, experience, location, search)
-- Job details and application submission
-- Application tracking with status tabs
-- Skill programs catalog
+## Project Structure
 
-### Employer Features
+```
+src/
+├── components/
+│   ├── ui/              # shadcn/ui components (avatar, badge, button, card, dialog, etc)
+│   ├── shared/          # Reusable components (Navbar, Footer, ProtectedRoute, LoadingState, EmptyState)
+│   └── common/          # Feature-specific components (NewsUpdates, NotificationUpdates)
+├── pages/
+│   ├── auth/            # Authentication pages (Login, Register, ForgotPassword, ResetPassword, VerifyEmail)
+│   ├── common/          # Public pages (Home, About, Contact, Articles, ArticleDetail, Jobs, JobDetail, Programs, ProgramDetail)
+│   ├── learner/         # Learner features (Dashboard, Profile, Jobs, JobDetail, Applications, Explore, Onboarding, Programs)
+│   ├── employer/        # Employer features (Dashboard, Profile, Jobs, JobForm, Applications, Articles, ArticleForm)
+│   └── admin/           # Admin features (Dashboard, News, Programs, Users, Contacts)
+├── routes/
+│   ├── index.jsx        # Main route configuration
+│   ├── authRoutes.jsx   # Authentication routes (/login, /register, /forgot-password, /reset-password, /verify-email)
+│   ├── publicRoutes.jsx # Public accessible routes (/, /about, /contact, /jobs, /articles, /programs)
+│   ├── learnerRoutes.jsx    # Learner protected routes (/learner/*)
+│   ├── employerRoutes.jsx   # Employer protected routes (/employer/*)
+│   └── adminRoutes.jsx  # Admin protected routes (/admin/*)
+├── layouts/
+│   ├── MainLayout.jsx       # Main layout with navbar and footer
+│   ├── AuthLayout.jsx       # Centered auth layout
+│   ├── DashboardLayout.jsx  # Dashboard with sidebar
+│   ├── LearnerLayout.jsx    # Learner specific layout
+│   └── AdminLayout.jsx      # Admin specific layout
+├── lib/
+│   ├── api.js           # Axios instance with interceptors
+│   ├── constants.js     # Application constants and enums
+│   ├── utils.js         # Utility functions
+│   └── services/        # API service layer
+│       ├── authService.js
+│       ├── profileService.js
+│       ├── jobService.js
+│       ├── applicationService.js
+│       ├── articleService.js
+│       ├── newsService.js
+│       ├── skillProgramService.js
+│       ├── dashboardService.js
+│       ├── notificationService.js
+│       ├── matchingService.js
+│       ├── contactService.js
+│       └── socketService.js
+├── store/
+│   ├── index.js         # Redux store configuration
+│   └── slices/          # Redux slices (authSlice, jobSlice, profileSlice, uiSlice)
+├── context/
+│   └── SocketContext.jsx    # WebSocket context for real-time features
+├── App.jsx              # Root app component
+├── main.jsx             # Vite entry point
+└── index.css            # Global styles
+```
 
-- Dashboard with job statistics and analytics
-- Job management (create, edit, delete, status control)
-- Application management per job
-- Application status updates
-- Article creation and management
-- Company profile management
+## Core Features
 
-### Admin Features
+**Authentication & Authorization**
 
-- Platform statistics dashboard
-- News/announcements management
-- Skill programs management
-- Priority and category system
-- Active/inactive status control
+- User registration with role selection
+- Email/password login with JWT tokens
+- Forgot password and reset workflow
+- Email verification with tokens
+- Role-based route protection (Learner, Employer, Admin)
+- Automatic logout on token expiration (401)
 
-### Performance Optimizations
+**Learner Experience**
 
-- Lazy loading for all routes
-- Code splitting
-- Debounced search inputs (500ms)
-- Pagination for large lists
-- Loading states and skeletons
-- Empty state components
-- CSV export functionality
+- Interactive dashboard with stats and job recommendations
+- Complete profile setup (skills, experience, education, certifications)
+- Advanced job search with filters (location, type, salary range)
+- One-click job applications with status tracking
+- Application management and withdrawal
+- Skill program discovery and enrollment
+- Personalized job recommendations
+
+**Employer Portal**
+
+- Job posting and management (create, edit, publish, close)
+- Application tracking with status updates
+- Applicant profile review and evaluation
+- Articles/content management for company visibility
+- Analytics dashboard with key metrics
+- Company profile customization
+
+**Admin Dashboard**
+
+- Platform statistics and insights
+- News/announcement management with search and activation toggle
+- Skill program administration
+- User management and moderation
+- Contact form submissions management
+- Reply to contact inquiries with email notifications
+- Content moderation
+
+**Public Pages**
+
+- About page with mission, vision, and values
+- Contact form for user inquiries
+- Real-time news updates popover
+- Real-time notification updates popover
+
+## API Integration
+
+All API communication handled through service modules in `lib/services/`. Each service encapsulates endpoints for a specific feature:
+
+**Service Pattern**
+
+```javascript
+export const jobService = {
+  getAllJobs: async (filters) => api.get("/jobs", { params: filters }),
+  getJobById: async (id) => api.get(`/jobs/${id}`),
+  createJob: async (data) => api.post("/jobs", data),
+  updateJob: async (id, data) => api.patch(`/jobs/${id}`, data),
+  deleteJob: async (id) => api.delete(`/jobs/${id}`),
+  getMyJobs: async () => api.get("/jobs/my-jobs"),
+};
+```
+
+**HTTP Configuration**
+
+- Base URL: `http://localhost:5000/api`
+- Bearer token auto-injection in Authorization header
+- Global error handling with toast notifications (Sonner)
+- Request/response interceptors for logging
+- Automatic 401 handling with redirect to login
+- No console.error in production (replaced with toast notifications)
+
+## State Management
+
+Redux Toolkit manages global state with slice-based architecture:
+
+**authSlice.js** - User authentication state (user object, JWT token, login status)
+**profileSlice.js** - Current user profile data
+**jobSlice.js** - Job listings, filters, pagination state
+**uiSlice.js** - UI state (themes, modals, sidebar)
+
+**Best Practices**
+
+- Redux for authentication and user profile
+- Local component state for page-specific data
+- Service layer for all API calls
+- Async/await pattern with error handling
 
 ## 📁 Project Structure
 
@@ -97,7 +199,11 @@ src/
 │       ├── articleService.js
 │       ├── newsService.js
 │       ├── skillProgramService.js
-│       └── dashboardService.js
+│       ├── dashboardService.js
+│       ├── notificationService.js
+│       ├── matchingService.js
+│       ├── contactService.js
+│       └── socketService.js
 ├── store/
 │   ├── index.js         # Redux store
 │   └── slices
@@ -121,43 +227,30 @@ All API interactions are handled through service modules in `lib/services/`:
 Each service uses the configured Axios instance (`lib/api.js`) with automatic token injection and 401 handling.
 
 export const jobService = {
-// Get all jobs with filters
 getAllJobs: async (filters = {}) => {
 const response = await api.get("/jobs", { params: filters });
 return response.data;
 },
-
-// Get single job
 getJobById: async (id) => {
 const response = await api.get(`/jobs/${id}`);
 return response.data;
 },
-
-// Create new job (employer only)
 createJob: async (jobData) => {
 const response = await api.post("/jobs", jobData);
 return response.data;
 },
-
-// Update job
 updateJob: async (id, jobData) => {
 const response = await api.patch(`/jobs/${id}`, jobData);
 return response.data;
 },
-
-// Delete job
 deleteJob: async (id) => {
 const response = await api.delete(`/jobs/${id}`);
 return response.data;
 },
-
-// Search jobs
 searchJobs: async (searchParams) => {
 const response = await api.get("/jobs/search", { params: searchParams });
 return response.data;
 },
-
-// Get my jobs (employer)
 getMyJobs: async (filters = {}) => {
 const response = await api.get("/jobs/my-jobs", { params: filters });
 return response.data;
@@ -206,7 +299,7 @@ function JobsList() {
 }
 ````
 
-### Service Modules to Create
+### Service Modules Implemented
 
 All service files in `lib/services/`:
 
@@ -215,22 +308,29 @@ All service files in `lib/services/`:
 - `jobService.js` - CRUD jobs, search, filters
 - `applicationService.js` - Apply, withdraw, update status
 - `articleService.js` - CRUD articles, publish
-- `newsService.js` - CRUD news/announcements
+- `newsService.js` - CRUD news/announcements with search and deactivation
 - `skillProgramService.js` - Browse skill programs
 - `dashboardService.js` - Get dashboard data
+- `notificationService.js` - Fetch and mark notifications as read
+- `matchingService.js` - Job recommendations
+- `contactService.js` - Submit contact form, admin CRUD operations
+- `socketService.js` - Real-time WebSocket connection
 
 ### API Endpoints Reference
 
-All endpoints tested and documented via backend tests (175 passing tests):
+All endpoints tested and documented via backend tests:
 
-**Auth**: `/api/auth/*`
-**Profile**: `/api/profile/*`
-**Jobs**: `/api/jobs/*`
-**Applications**: `/api/applications/*`
-**Articles**: `/api/articles/*`
-**News**: `/api/news/*`
-**Skill Programs**: `/api/skill-programs/*`
-**Dashboard**: `/api/dashboard/*`
+**Auth**: `/api/auth/*` - Login, register, password reset, email verification
+**Profile**: `/api/profile/*` - User profiles, skills, experience, education
+**Jobs**: `/api/jobs/*` - Job CRUD, search, filters
+**Applications**: `/api/applications/*` - Apply, track, update status
+**Articles**: `/api/articles/*` - Company articles management
+**News**: `/api/news/*` - News with search, category filter, activation toggle
+**Skill Programs**: `/api/skill-programs/*` - Training programs
+**Dashboard**: `/api/dashboard/*` - Analytics and statistics
+**Notifications**: `/api/notifications/*` - Real-time notifications
+**Matching**: `/api/matching/*` - Job recommendations
+**Contact**: `/api/contact/*` - Contact form and admin replies
 
 ---
 
@@ -502,15 +602,15 @@ export default function ComponentName() {
   const [state, setState] = useState();
 
   useEffect(() => {
-    // effects
+
   }, []);
 
   const handleAction = () => {
-    // handlers
+
   };
 
   return (
-    // JSX
+
   );
 }
 ```
@@ -556,8 +656,12 @@ export const serviceName = {
 - ✅ Employer job management
 - ✅ Application management for employers
 - ✅ Article creation and management
-- ✅ Admin news management
+- ✅ Admin news management with search and deactivation
 - ✅ Skill programs management
+- ✅ Contact form on public pages
+- ✅ Admin contact submissions management with reply functionality
+- ✅ Real-time news and notification updates
+- ✅ Toast notifications for all errors (no console.error)
 - ✅ Lazy loading and code splitting
 - ✅ Pagination and search optimization
 - ✅ Export functionality

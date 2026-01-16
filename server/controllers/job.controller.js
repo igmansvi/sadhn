@@ -1,15 +1,19 @@
-
-
 import Job from "../models/job.model.js";
 import mongoose from "mongoose";
 import { validationResult } from "express-validator";
-
 
 export const createJob = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can create jobs",
+      });
     }
 
     const jobData = {
@@ -33,7 +37,6 @@ export const createJob = async (req, res) => {
     });
   }
 };
-
 
 export const getJobs = async (req, res) => {
   try {
@@ -89,7 +92,6 @@ export const getJobs = async (req, res) => {
   }
 };
 
-
 export const getJobById = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id).populate(
@@ -120,9 +122,15 @@ export const getJobById = async (req, res) => {
   }
 };
 
-
 export const updateJob = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can update jobs",
+      });
+    }
+
     const job = await Job.findById(req.params.id);
 
     if (!job) {
@@ -158,9 +166,15 @@ export const updateJob = async (req, res) => {
   }
 };
 
-
 export const deleteJob = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can delete jobs",
+      });
+    }
+
     const job = await Job.findById(req.params.id);
 
     if (!job) {
@@ -192,9 +206,15 @@ export const deleteJob = async (req, res) => {
   }
 };
 
-
 export const getMyJobs = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can view their jobs",
+      });
+    }
+
     const {
       status,
       page = 1,
@@ -234,7 +254,6 @@ export const getMyJobs = async (req, res) => {
     });
   }
 };
-
 
 export const searchJobs = async (req, res) => {
   try {

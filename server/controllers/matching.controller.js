@@ -171,6 +171,13 @@ const calculateProgramMatch = (profile, program) => {
 
 export const getMatchedJobs = async (req, res) => {
   try {
+    if (!["learner", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only learners and admins can get matched jobs",
+      });
+    }
+
     const profile = await Profile.findOne({ user: req.user.id });
     if (!profile) {
       return res
@@ -223,6 +230,13 @@ export const getMatchedJobs = async (req, res) => {
 
 export const getMatchedPrograms = async (req, res) => {
   try {
+    if (!["learner", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only learners and admins can get matched programs",
+      });
+    }
+
     const profile = await Profile.findOne({ user: req.user.id });
     if (!profile) {
       return res
@@ -377,6 +391,8 @@ export const syncProfileSummary = async (userId) => {
   try {
     const profile = await Profile.findOne({ user: userId });
     if (!profile) return null;
+
+    if (profile.profileType !== "learner") return null;
 
     const totalExperience = (profile.experience || []).reduce((total, exp) => {
       if (!exp.startDate) return total;

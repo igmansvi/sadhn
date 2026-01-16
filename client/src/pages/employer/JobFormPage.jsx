@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +58,10 @@ export default function JobFormPage() {
     };
 
     const onSubmit = async (data) => {
+        if (!data.employmentType) {
+            toast.error("Employment type is required");
+            return;
+        }
         setSaving(true);
         try {
             const payload = {
@@ -67,7 +72,7 @@ export default function JobFormPage() {
                 salary: {
                     min: Number(data.salaryMin) || undefined,
                     max: Number(data.salaryMax) || undefined,
-                    currency: data.salaryCurrency || "USD",
+                    currency: data.salaryCurrency || "INR",
                 },
                 location: {
                     city: data.locationCity,
@@ -170,7 +175,7 @@ export default function JobFormPage() {
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="workMode">Work Mode *</Label>
+                                    <Label htmlFor="workMode">Work Mode</Label>
                                     <Select value={watch("workMode") || ""} onValueChange={(v) => setValue("workMode", v)}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select mode" />
@@ -252,7 +257,7 @@ export default function JobFormPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="salaryCurrency">Currency</Label>
-                                    <Input id="salaryCurrency" {...register("salaryCurrency")} defaultValue={watch("salary.currency") || "USD"} />
+                                    <Input id="salaryCurrency" {...register("salaryCurrency")} defaultValue={watch("salary.currency") || "INR"} />
                                 </div>
                             </div>
                         </div>

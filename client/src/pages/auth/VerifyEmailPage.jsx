@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { authService } from "@/lib/services/authService";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
@@ -18,8 +19,11 @@ export default function VerifyEmailPage() {
             try {
                 await authService.verifyEmail(token);
                 setVerified(true);
+                toast.success("Email verified successfully");
             } catch (err) {
-                setError(err.response?.data?.message || "Verification failed");
+                const msg = err.response?.data?.message || "Verification failed";
+                setError(msg);
+                toast.error(msg);
             } finally {
                 setLoading(false);
             }

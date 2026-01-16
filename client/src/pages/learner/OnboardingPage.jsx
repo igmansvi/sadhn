@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,7 +54,7 @@ export default function OnboardingPage() {
         headline: "",
         summary: "",
         phone: "",
-        location: { city: "", state: "", country: "" },
+        location: { city: "", state: "", country: "India" },
         skills: [],
         experience: [],
         education: [],
@@ -87,6 +88,14 @@ export default function OnboardingPage() {
     });
     const [tempLanguage, setTempLanguage] = useState({ name: "", proficiency: "conversational" });
     const [locationInput, setLocationInput] = useState("");
+
+    const { profile } = useSelector((state) => state.profile);
+
+    useEffect(() => {
+        if (profile) {
+            navigate("/learner/explore", { replace: true });
+        }
+    }, [profile, navigate]);
 
     const updateFormData = (field, value) => {
         setFormData((prev) => {
@@ -324,7 +333,7 @@ export default function OnboardingPage() {
     const renderStep1 = () => (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="headline">Professional Headline *</Label>
+                <Label htmlFor="headline">Professional Headline</Label>
                 <Input
                     id="headline"
                     value={formData.headline}
@@ -410,7 +419,7 @@ export default function OnboardingPage() {
     const renderStep2 = () => (
         <div className="space-y-6">
             <div className="space-y-4">
-                <Label>Add Your Skills *</Label>
+                <Label>Add Your Skills</Label>
                 <div className="flex gap-2">
                     <Input
                         value={tempSkill.name}
@@ -777,9 +786,6 @@ export default function OnboardingPage() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="INR">INR</SelectItem>
-                            <SelectItem value="USD">USD</SelectItem>
-                            <SelectItem value="EUR">EUR</SelectItem>
-                            <SelectItem value="GBP">GBP</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

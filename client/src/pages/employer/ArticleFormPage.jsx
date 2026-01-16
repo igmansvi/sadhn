@@ -49,6 +49,10 @@ export default function ArticleFormPage() {
     };
 
     const onSubmit = async (data) => {
+        if (!data.category) {
+            toast.error("Category is required");
+            return;
+        }
         setSaving(true);
         try {
             if (isEdit) {

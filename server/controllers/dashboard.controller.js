@@ -9,6 +9,13 @@ import mongoose from "mongoose";
 
 export const getLearnerDashboard = async (req, res) => {
   try {
+    if (!["learner", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only learners and admins can access learner dashboard",
+      });
+    }
+
     const userId = req.user.id;
 
     const profile = await Profile.findOne({ user: userId });
@@ -84,6 +91,13 @@ export const getLearnerDashboard = async (req, res) => {
 
 export const getRecruiterDashboard = async (req, res) => {
   try {
+    if (!["employer", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only employers and admins can access recruiter dashboard",
+      });
+    }
+
     const userId = req.user.id;
 
     const jobStats = await Job.aggregate([
@@ -174,6 +188,13 @@ export const getRecruiterDashboard = async (req, res) => {
 
 export const getAdminDashboard = async (req, res) => {
   try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can access admin dashboard",
+      });
+    }
+
     const totalUsers = await User.countDocuments({
       isActive: true,
       role: { $ne: "admin" },

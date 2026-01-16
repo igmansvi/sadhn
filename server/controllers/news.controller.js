@@ -8,6 +8,13 @@ export const createNews = async (req, res) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can create news",
+      });
+    }
+
     const newsData = {
       ...req.body,
       publishedBy: req.user.id,
@@ -35,21 +42,38 @@ export const getAllNews = async (req, res) => {
     const {
       category,
       priority,
+      search,
       page = 1,
       limit = 20,
       sortBy = "createdAt",
       sortOrder = "desc",
+      includeInactive = false,
     } = req.query;
 
-    const query = { isActive: true };
+    const query = {};
+
+    if (includeInactive !== "true" && !req.user?.role?.includes("admin")) {
+      query.isActive = true;
+      query.expiryDate = { $gt: new Date() };
+    } else if (
+      req.user?.role?.includes("admin") &&
+      includeInactive !== "true"
+    ) {
+      query.expiryDate = { $gt: new Date() };
+    }
 
     if (category) query.category = category;
     if (priority) query.priority = priority;
 
-    query.$or = [
-      { expiryDate: { $exists: false } },
-      { expiryDate: { $gt: new Date() } },
-    ];
+    if (search) {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { content: { $regex: search, $options: "i" } },
+        ],
+      });
+    }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const sort = { priority: -1, [sortBy]: sortOrder === "desc" ? -1 : 1 };
@@ -117,6 +141,13 @@ export const getNewsById = async (req, res) => {
 
 export const updateNews = async (req, res) => {
   try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can update news",
+      });
+    }
+
     const news = await News.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -145,6 +176,13 @@ export const updateNews = async (req, res) => {
 
 export const deleteNews = async (req, res) => {
   try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can delete news",
+      });
+    }
+
     const news = await News.findByIdAndDelete(req.params.id);
 
     if (!news) {

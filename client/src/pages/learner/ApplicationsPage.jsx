@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,20 @@ import { APPLICATION_STATUS_LABELS } from "@/lib/constants";
 import { formatDate, getTimeAgo } from "@/lib/utils";
 import { FileText, Building, MapPin, Clock, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+
+const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.4 }
+};
+
+const staggerContainer = {
+    animate: {
+        transition: {
+            staggerChildren: 0.06
+        }
+    }
+};
 
 export default function ApplicationsPage() {
     const [applications, setApplications] = useState([]);
@@ -64,10 +79,17 @@ export default function ApplicationsPage() {
 
     return (
         <div className="container mx-auto p-6">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold">My Applications</h1>
-                <p className="text-muted-foreground">Track and manage your job applications</p>
-            </div>
+            <motion.div
+                className="mb-6"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <h1 className="text-3xl font-bold">
+                    My <span className="gradient-text">Applications</span>
+                </h1>
+                <p className="text-muted-foreground mt-1">Track and manage your job applications</p>
+            </motion.div>
 
             <Tabs value={activeTab} onValueChange={handleTabChange}>
                 <TabsList className="mb-6">
@@ -88,67 +110,87 @@ export default function ApplicationsPage() {
                         </div>
                     ) : applications.length > 0 ? (
                         <>
-                            <div className="space-y-4">
+                            <motion.div
+                                className="space-y-4"
+                                variants={staggerContainer}
+                                initial="initial"
+                                animate="animate"
+                            >
                                 {applications.map((application) => (
-                                    <Card key={application._id}>
-                                        <CardContent className="p-6">
-                                            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                                                <div className="flex items-start gap-4">
-                                                    <div className="h-12 w-12 bg-muted rounded-lg flex items-center justify-center shrink-0">
-                                                        <Building className="h-6 w-6 text-muted-foreground" />
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="font-semibold">{application.job?.title}</h3>
-                                                        <p className="text-muted-foreground">{application.job?.company}</p>
-                                                        <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-muted-foreground">
-                                                            {application.job?.location && (
-                                                                <span className="flex items-center gap-1">
-                                                                    <MapPin className="h-3.5 w-3.5" />
-                                                                    {application.job.location.city}
-                                                                </span>
-                                                            )}
-                                                            <span className="flex items-center gap-1">
-                                                                <Clock className="h-3.5 w-3.5" />
-                                                                Applied {getTimeAgo(application.appliedAt)}
-                                                            </span>
+                                    <motion.div key={application._id} variants={fadeInUp}>
+                                        <motion.div
+                                            whileHover={{ scale: 1.01, y: -2 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border hover:border-primary/50 bg-gradient-to-br from-card to-muted/10">
+                                                <CardContent className="p-6">
+                                                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                                                        <div className="flex items-start gap-4">
+                                                            <motion.div
+                                                                className="h-12 w-12 gradient-primary rounded-lg flex items-center justify-center shrink-0 shadow-md"
+                                                                whileHover={{ rotate: 360 }}
+                                                                transition={{ duration: 0.6 }}
+                                                            >
+                                                                <Building className="h-6 w-6 text-primary-foreground" />
+                                                            </motion.div>
+                                                            <div>
+                                                                <h3 className="font-semibold">{application.job?.title}</h3>
+                                                                <p className="text-muted-foreground">{application.job?.company}</p>
+                                                                <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-muted-foreground">
+                                                                    {application.job?.location && (
+                                                                        <span className="flex items-center gap-1">
+                                                                            <MapPin className="h-3.5 w-3.5" />
+                                                                            {application.job.location.city}
+                                                                        </span>
+                                                                    )}
+                                                                    <span className="flex items-center gap-1">
+                                                                        <Clock className="h-3.5 w-3.5" />
+                                                                        Applied {getTimeAgo(application.appliedAt)}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col items-end gap-2">
+                                                            {getStatusBadge(application.status)}
+                                                            <div className="flex items-center gap-2 mt-2">
+                                                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                                    <Button variant="outline" size="sm" asChild>
+                                                                        <Link to={`/learner/jobs/${application.job?._id}`}>
+                                                                            <ExternalLink className="h-4 w-4 mr-1" />
+                                                                            View Job
+                                                                        </Link>
+                                                                    </Button>
+                                                                </motion.div>
+                                                                {application.status === "applied" && (
+                                                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="text-destructive"
+                                                                            onClick={() => handleWithdraw(application._id)}
+                                                                        >
+                                                                            Withdraw
+                                                                        </Button>
+                                                                    </motion.div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className="flex flex-col items-end gap-2">
-                                                    {getStatusBadge(application.status)}
-                                                    <div className="flex items-center gap-2 mt-2">
-                                                        <Button variant="outline" size="sm" asChild>
-                                                            <Link to={`/learner/jobs/${application.job?._id}`}>
-                                                                <ExternalLink className="h-4 w-4 mr-1" />
-                                                                View Job
-                                                            </Link>
-                                                        </Button>
-                                                        {application.status === "applied" && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="text-destructive"
-                                                                onClick={() => handleWithdraw(application._id)}
-                                                            >
-                                                                Withdraw
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {application.coverLetter && (
-                                                <div className="mt-4 pt-4 border-t">
-                                                    <p className="text-sm text-muted-foreground">
-                                                        <span className="font-medium">Cover Letter: </span>
-                                                        {application.coverLetter.substring(0, 200)}
-                                                        {application.coverLetter.length > 200 && "..."}
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </CardContent>
-                                    </Card>
+                                                    {application.coverLetter && (
+                                                        <div className="mt-4 pt-4 border-t">
+                                                            <p className="text-sm text-muted-foreground">
+                                                                <span className="font-medium">Cover Letter: </span>
+                                                                {application.coverLetter.substring(0, 200)}
+                                                                {application.coverLetter.length > 200 && "..."}
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </CardContent>
+                                            </Card>
+                                        </motion.div>
+                                    </motion.div>
                                 ))}
-                            </div>
+                            </motion.div>
                             <Pagination
                                 pagination={pagination}
                                 onPageChange={setPage}

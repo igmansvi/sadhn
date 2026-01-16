@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
     BookOpen,
@@ -19,6 +21,21 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { skillProgramService } from "@/lib/services/skillProgramService";
+import { toast } from "sonner";
+
+const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.4 }
+};
+
+const staggerContainer = {
+    animate: {
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
 
 export default function ProgramDetailPage() {
     const { id } = useParams();
@@ -37,8 +54,9 @@ export default function ProgramDetailPage() {
                 const response = await skillProgramService.getProgramById(id);
                 setProgram(response.data);
             } catch (err) {
-                setError("Failed to load program details");
-                console.error("Failed to fetch program:", err);
+                const msg = err.response?.data?.message || "Failed to load program details";
+                setError(msg);
+                toast.error(msg);
             } finally {
                 setLoading(false);
             }
@@ -110,129 +128,153 @@ export default function ProgramDetailPage() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <Button variant="ghost" asChild className="mb-6">
-                <Link to="/programs">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Programs
-                </Link>
-            </Button>
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+            >
+                <Button variant="ghost" asChild className="mb-6">
+                    <Link to="/programs">
+                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        Back to Programs
+                    </Link>
+                </Button>
+            </motion.div>
 
             <div className="grid lg:grid-cols-3 gap-8">
-                {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6">
-                    <Card>
-                        <CardContent className="p-6">
-                            <div className="flex items-start gap-4 mb-4">
-                                <div className="h-16 w-16 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                                    <BookOpen className="h-8 w-8 text-primary" />
-                                </div>
-                                <div className="flex-1">
-                                    <h1 className="text-2xl font-bold mb-2">{program.title}</h1>
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                        <Globe className="h-4 w-4" />
-                                        <span>{program.platform}</span>
-                                        {program.rating && (
-                                            <>
-                                                <span className="mx-2">•</span>
-                                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                                <span>{program.rating}</span>
-                                            </>
-                                        )}
+                <motion.div
+                    className="lg:col-span-2 space-y-6"
+                    variants={staggerContainer}
+                    initial="initial"
+                    animate="animate"
+                >
+                    <motion.div variants={fadeInUp}>
+                        <Card className="shadow-lg border-0 bg-linear-to-br from-card to-muted/20">
+                            <CardContent className="p-6">
+                                <div className="flex items-start gap-4 mb-4">
+                                    <motion.div
+                                        className="h-16 w-16 gradient-secondary rounded-lg flex items-center justify-center shrink-0 shadow-md"
+                                        whileHover={{ rotate: 360 }}
+                                        transition={{ duration: 0.6 }}
+                                    >
+                                        <BookOpen className="h-8 w-8 text-secondary-foreground" />
+                                    </motion.div>
+                                    <div className="flex-1">
+                                        <h1 className="text-3xl font-bold mb-2">{program.title}</h1>
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                            <Globe className="h-4 w-4" />
+                                            <span>{program.platform}</span>
+                                            {program.rating && (
+                                                <>
+                                                    <span className="mx-2">•</span>
+                                                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                                    <span>{program.rating}</span>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                <Badge variant="outline">{program.level}</Badge>
-                                {program.category && (
-                                    <Badge variant="secondary">{program.category}</Badge>
-                                )}
-                                {program.duration && (
-                                    <Badge variant="outline" className="gap-1">
-                                        <Clock className="h-3 w-3" />
-                                        {program.duration.value} {program.duration.unit}
-                                    </Badge>
-                                )}
-                                {program.certificateOffered && (
-                                    <Badge className="gap-1 bg-green-100 text-green-700 hover:bg-green-100">
-                                        <Award className="h-3 w-3" />
-                                        Certificate Offered
-                                    </Badge>
-                                )}
-                            </div>
-
-                            <Separator className="my-4" />
-
-                            <div>
-                                <h2 className="font-semibold mb-3">About This Program</h2>
-                                <p className="text-muted-foreground whitespace-pre-line">
-                                    {program.description}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Skills Covered */}
-                    {program.skillsCovered?.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-lg">Skills You'll Learn</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex flex-wrap gap-2">
-                                    {program.skillsCovered.map((skill, idx) => (
-                                        <Badge key={idx} variant="secondary">
-                                            <CheckCircle className="h-3 w-3 mr-1" />
-                                            {skill}
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    <Badge variant="outline">{program.level}</Badge>
+                                    {program.category && (
+                                        <Badge variant="secondary">{program.category}</Badge>
+                                    )}
+                                    {program.duration && (
+                                        <Badge variant="outline" className="gap-1">
+                                            <Clock className="h-3 w-3" />
+                                            {program.duration.value} {program.duration.unit}
                                         </Badge>
-                                    ))}
+                                    )}
+                                    {program.certificateOffered && (
+                                        <Badge className="gap-1 gradient-primary text-primary-foreground">
+                                            <Award className="h-3 w-3" />
+                                            Certificate Offered
+                                        </Badge>
+                                    )}
+                                </div>
+
+                                <Separator className="my-4" />
+
+                                <div>
+                                    <h2 className="font-semibold mb-3">About This Program</h2>
+                                    <p className="text-muted-foreground whitespace-pre-line">
+                                        {program.description}
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
+                    </motion.div>
+
+                    {program.skillsCovered?.length > 0 && (
+                        <motion.div variants={fadeInUp}>
+                            <Card className="shadow-lg">
+                                <CardHeader>
+                                    <CardTitle className="text-lg">Skills You'll Learn</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex flex-wrap gap-2">
+                                        {program.skillsCovered.map((skill, idx) => (
+                                            <Badge key={idx} variant="secondary">
+                                                <CheckCircle className="h-3 w-3 mr-1" />
+                                                {skill}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </motion.div>
                     )}
 
-                    {/* Prerequisites */}
                     {program.prerequisites?.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-lg">Prerequisites</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <ul className="space-y-2">
-                                    {program.prerequisites.map((prereq, idx) => (
-                                        <li key={idx} className="flex items-start gap-2">
-                                            <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                                            <span className="text-muted-foreground">{prereq}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
+                        <motion.div variants={fadeInUp}>
+                            <Card className="shadow-lg">
+                                <CardHeader>
+                                    <CardTitle className="text-lg">Prerequisites</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <ul className="space-y-2">
+                                        {program.prerequisites.map((prereq, idx) => (
+                                            <li key={idx} className="flex items-start gap-2">
+                                                <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                                                <span className="text-muted-foreground">{prereq}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </CardContent>
+                            </Card>
+                        </motion.div>
                     )}
-                </div>
+                </motion.div>
 
-                {/* Sidebar */}
-                <div className="space-y-6">
-                    <Card className="sticky top-24">
+                <motion.div
+                    className="space-y-6"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                    <Card className="sticky top-24 shadow-lg">
                         <CardContent className="p-6">
                             <div className="text-center mb-6">
                                 {program.price?.isFree ? (
-                                    <div className="text-3xl font-bold text-green-600">Free</div>
+                                    <div className="text-3xl font-bold gradient-text">Free</div>
                                 ) : (
-                                    <div className="text-3xl font-bold">
+                                    <div className="text-3xl font-bold gradient-text">
                                         {program.price?.currency} {program.price?.amount}
                                     </div>
                                 )}
                             </div>
 
-                            <Button
-                                className="w-full mb-4"
-                                size="lg"
-                                onClick={handleEnrollClick}
-                            >
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Enroll Now
-                            </Button>
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                <Button
+                                    className="w-full mb-4 gradient-primary"
+                                    size="lg"
+                                    onClick={handleEnrollClick}
+                                >
+                                    <ExternalLink className="h-4 w-4 mr-2" />
+                                    Enroll Now
+                                </Button>
+                            </motion.div>
 
                             {!isAuthenticated && (
                                 <p className="text-sm text-muted-foreground text-center mb-4">
@@ -281,7 +323,7 @@ export default function ProgramDetailPage() {
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </motion.div>
             </div>
         </div>
     );
