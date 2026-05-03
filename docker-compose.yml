@@ -1,6 +1,15 @@
 name: "sadhn"
 
 services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - sadhn-net
+
   server:
     build: ./server
     volumes:
@@ -8,6 +17,10 @@ services:
       - /app/node_modules
     env_file:
       - ./server/.env
+    depends_on:
+      - mongodb
+    networks:
+      - sadhn-net
 
   client:
     build: ./client
@@ -18,9 +31,11 @@ services:
       - ./client/.env
     depends_on:
       - server
+    networks:
+      - sadhn-net
 
   nginx:
-    image: nginx:alpine
+    image: nginx:latest
     ports:
       - "80:80"
     volumes:
@@ -28,3 +43,12 @@ services:
     depends_on:
       - client
       - server
+    networks:
+      - sadhn-net
+
+volumes:
+  mongodb-data:
+
+networks:
+  sadhn-net:
+    driver: bridge
