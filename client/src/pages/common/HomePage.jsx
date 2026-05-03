@@ -68,7 +68,7 @@ function InteractiveHeroVisual() {
             />
 
             <motion.div
-                className="relative rounded-3xl border border-border/60 bg-card/80 backdrop-blur-md shadow-2xl p-6"
+                className="relative"
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
