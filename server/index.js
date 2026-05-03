@@ -64,6 +64,38 @@ app.get("/", (req, res) => {
   res.json({ message: "Server is running", version: "1.0.0" });
 });
 
+app.get("/api/health", async (req, res) => {
+  try {
+    const mongoose = (await import("mongoose")).default;
+    const dbState = mongoose.connection.readyState;
+    const dbStates = {
+      0: "disconnected",
+      1: "connected",
+      2: "connecting",
+      3: "disconnecting",
+    };
+
+    res.json({
+      success: true,
+      status: "ok",
+      uptime: process.uptime(),
+      timestamp: Date.now(),
+      database: {
+        status: dbStates[dbState] || "unknown",
+        connected: dbState === 1,
+      },
+    });
+  } catch (error) {
+    res.status(503).json({
+      success: false,
+      status: "error",
+      message: "Health check failed",
+      timestamp: Date.now(),
+      database: { status: "unknown", connected: false },
+    });
+  }
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/jobs", jobRouter);

@@ -6,6 +6,7 @@ import { routes } from "@/routes";
 import { SocketProvider } from "@/context/SocketContext";
 import { useDispatch } from "react-redux";
 import { fetchUser } from "@/store/slices/authSlice";
+import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { Analytics } from "@vercel/analytics/react"
 
 const renderRoutes = (routeConfig) => {
@@ -37,6 +38,9 @@ export default function App() {
       dispatch(fetchUser());
     }
   }, [dispatch]);
+
+  useHealthCheck();
+
   return (
     <BrowserRouter>
       <SocketProvider>

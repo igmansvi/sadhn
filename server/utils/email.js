@@ -5,6 +5,10 @@ const resend = new Resend(config.RESEND_API_KEY);
 
 export const sendEmail = async ({ to, subject, html }) => {
   try {
+    if (config.NODE_ENV === "test") {
+      return { id: "test-email" };
+    }
+
     const data = await resend.emails.send({
       from: config.EMAIL_FROM,
       to: config.EMAIL_TO,
