@@ -1,5 +1,7 @@
 import User from "../models/user.model.js";
 import { validationResult } from "express-validator";
+import { verifyEmailTemplate } from "../templates/verifyEmail.js";
+import { resetPasswordTemplate } from "../templates/resetPassword.js";
 
 export const register = async (req, res) => {
   try {
@@ -31,19 +33,7 @@ export const register = async (req, res) => {
       await sendEmail({
         to: user.email,
         subject: "Verify Your Email - SADHN",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #2563eb;">Welcome to SADHN!</h2>
-            <p>Hi ${user.name},</p>
-            <p>Thank you for registering. Please verify your email address by clicking the button below:</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${verificationUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Verify Email</a>
-            </div>
-            <p>Or copy and paste this link into your browser:</p>
-            <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
-            <p style="color: #666; font-size: 14px; margin-top: 30px;">This link will expire in 24 hours.</p>
-          </div>
-        `,
+        html: verifyEmailTemplate(user.name, user.email, verificationUrl),
       });
     } catch (emailError) {
       console.error("Failed to send verification email:", emailError);
@@ -174,19 +164,7 @@ export const sendVerificationEmail = async (req, res) => {
     await sendEmail({
       to: user.email,
       subject: "Verify Your Email - SADHN",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb;">Verify Your Email</h2>
-          <p>Hi ${user.name},</p>
-          <p>Please verify your email address by clicking the button below:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${verificationUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Verify Email</a>
-          </div>
-          <p>Or copy and paste this link into your browser:</p>
-          <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
-          <p style="color: #666; font-size: 14px; margin-top: 30px;">This link will expire in 24 hours.</p>
-        </div>
-      `,
+      html: verifyEmailTemplate(user.name, user.email, verificationUrl),
     });
 
     res.status(200).json({
@@ -258,20 +236,7 @@ export const forgotPassword = async (req, res) => {
     await sendEmail({
       to: user.email,
       subject: "Password Reset Request - SADHN",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb;">Password Reset Request</h2>
-          <p>Hi ${user.name},</p>
-          <p>You requested to reset your password. Click the button below to create a new password:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
-          </div>
-          <p>Or copy and paste this link into your browser:</p>
-          <p style="color: #666; word-break: break-all;">${resetUrl}</p>
-          <p style="color: #666; font-size: 14px; margin-top: 30px;">This link will expire in 1 hour.</p>
-          <p style="color: #666; font-size: 14px;">If you didn't request this, please ignore this email.</p>
-        </div>
-      `,
+      html: resetPasswordTemplate(user.name, resetUrl),
     });
 
     res.status(200).json({

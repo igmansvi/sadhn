@@ -1,6 +1,9 @@
 import { validationResult } from "express-validator";
 import { sendEmail } from "../utils/email.js";
 import Contact from "../models/contact.model.js";
+import { contactFormAdminTemplate } from "../templates/contactFormAdmin.js";
+import { contactFormUserTemplate } from "../templates/contactFormUser.js";
+import { contactReplyTemplate } from "../templates/contactReply.js";
 
 export const submitContactForm = async (req, res) => {
   try {
@@ -18,43 +21,16 @@ export const submitContactForm = async (req, res) => {
       message,
     });
 
-    const htmlContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2563eb;">New Contact Form Submission</h2>
-        <p>Hi Admin,</p>
-        <p>A new contact form has been submitted. Here are the details:</p>
-        <div style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
-          <p><strong>From:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <p><strong>Message:</strong></p>
-          <p style="color: #666; line-height: 1.6;">${message}</p>
-        </div>
-        <p style="color: #666; font-size: 14px; margin-top: 30px;">Please respond to the user as soon as possible.</p>
-      </div>
-    `;
-
     await sendEmail({
       to: process.env.EMAIL_USER || "support@sadhn.org",
       subject: `Contact Form: ${subject}`,
-      html: htmlContent,
+      html: contactFormAdminTemplate(name, email, subject, message),
     });
 
     await sendEmail({
       to: email,
       subject: "Thank you for contacting SADHN",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb;">Thank You for Contacting SADHN</h2>
-          <p>Hi ${name},</p>
-          <p>We have received your message and will get back to you as soon as possible.</p>
-          <div style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
-            <p><strong>Your message:</strong></p>
-            <p style="color: #666; line-height: 1.6;">${message}</p>
-          </div>
-          <p style="color: #666; font-size: 14px; margin-top: 30px;">Best regards,<br>The SADHN Team</p>
-        </div>
-      `,
+      html: contactFormUserTemplate(name, message),
     });
 
     res.json({
@@ -132,7 +108,7 @@ export const getContactById = async (req, res) => {
   try {
     const contact = await Contact.findById(req.params.id).populate(
       "respondedBy",
-      "name email"
+      "name email",
     );
 
     if (!contact) {
@@ -167,7 +143,7 @@ export const updateContactStatus = async (req, res) => {
         respondedBy: req.user.id,
         respondedAt: status === "responded" ? new Date() : undefined,
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     ).populate("respondedBy", "name email");
 
     if (!contact) {
@@ -266,21 +242,7 @@ export const replyToContact = async (req, res) => {
     await sendEmail({
       to: contact.email,
       subject: `Re: ${contact.subject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb;">Reply to Your Message</h2>
-          <p>Hi ${contact.name},</p>
-          <p>Thank you for contacting us. Here is our response:</p>
-          <div style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
-            <p style="color: #666; line-height: 1.6; white-space: pre-wrap;">${reply}</p>
-          </div>
-          <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 5px; margin: 20px 0;">
-            <p><strong>Your original message:</strong></p>
-            <p style="color: #666; line-height: 1.6; white-space: pre-wrap;">${contact.message}</p>
-          </div>
-          <p style="color: #666; font-size: 14px; margin-top: 30px;">Best regards,<br>The SADHN Team</p>
-        </div>
-      `,
+      html: contactReplyTemplate(contact.name, reply, contact.message),
     });
 
     res.json({
