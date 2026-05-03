@@ -6,6 +6,7 @@ import { routes } from "@/routes";
 import { SocketProvider } from "@/context/SocketContext";
 import { useDispatch } from "react-redux";
 import { fetchUser } from "@/store/slices/authSlice";
+import { Analytics } from "@vercel/analytics/react"
 
 const renderRoutes = (routeConfig) => {
   return routeConfig.map((route, index) => {
@@ -44,6 +45,7 @@ export default function App() {
         </Suspense>
         <Toaster position="top-right" richColors closeButton />
       </SocketProvider>
+      <Analytics />
     </BrowserRouter>
   );
 }

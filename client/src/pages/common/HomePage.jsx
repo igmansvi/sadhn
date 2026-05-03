@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import hsArt from "@/assests/hs_art.svg";
 import {
     Briefcase,
     Users,
@@ -44,279 +45,60 @@ const scaleOnHover = {
 };
 
 function InteractiveHeroVisual() {
-    const [activeCard, setActiveCard] = useState(null);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-    const handleMouseMove = (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        setMousePosition({
-            x: (e.clientX - rect.left) / rect.width,
-            y: (e.clientY - rect.top) / rect.height,
-        });
-    };
-
-    const features = [
-        { label: "Engineering", icon: Code, color: "from-blue-500 to-cyan-500" },
-        { label: "Growth", icon: TrendingUp, color: "from-purple-500 to-pink-500" },
-        { label: "Network", icon: Users, color: "from-green-500 to-teal-500" },
-        { label: "Speed", icon: Zap, color: "from-orange-500 to-red-500" },
-    ];
+    const [isHovered, setIsHovered] = useState(false);
 
     return (
-        <div
-            className="relative w-full h-[600px] hidden lg:block overflow-hidden"
-            onMouseMove={handleMouseMove}
+        <motion.div
+            className="relative hidden lg:block"
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
-                className="relative w-full h-full"
+                className="absolute -top-8 -left-6 h-28 w-28 rounded-full bg-primary/15 blur-2xl"
+                animate={{ scale: isHovered ? 1.2 : 1, opacity: isHovered ? 0.8 : 0.55 }}
+                transition={{ duration: 0.4 }}
+            />
+            <motion.div
+                className="absolute -bottom-8 -right-6 h-32 w-32 rounded-full bg-secondary/20 blur-2xl"
+                animate={{ scale: isHovered ? 1.15 : 1, opacity: isHovered ? 0.8 : 0.45 }}
+                transition={{ duration: 0.4 }}
+            />
+
+            <motion.div
+                className="relative"
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
-                <motion.div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                        background: `radial-gradient(600px at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(59, 130, 246, 0.15), transparent 80%)`,
-                    }}
+                <motion.img
+                    src={hsArt}
+                    alt="Career growth illustration"
+                    className="w-full h-auto max-h-140 object-contain"
+                    animate={{ scale: isHovered ? 1.03 : 1 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
                 />
 
                 <motion.div
-                    className="absolute inset-0 border-2 border-primary/20 rounded-3xl pointer-events-none"
-                    animate={{
-                        rotate: [0, 360],
-                    }}
-                    transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                />
-
-                <motion.div
-                    className="absolute inset-0 border border-secondary/10 rounded-3xl pointer-events-none"
-                    animate={{
-                        rotate: [360, 0],
-                    }}
-                    transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                />
-
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <motion.div
-                        className="relative w-72 h-72"
-                        animate={{
-                            y: [0, -40, 0],
-                        }}
-                        transition={{
-                            duration: 6,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                        }}
-                    >
-                        <motion.div
-                            className="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-primary rounded-3xl shadow-2xl"
-                            animate={{
-                                boxShadow: [
-                                    "0 20px 60px rgba(37, 99, 235, 0.3)",
-                                    "0 30px 80px rgba(147, 51, 234, 0.4)",
-                                    "0 20px 60px rgba(37, 99, 235, 0.3)",
-                                ],
-                            }}
-                            transition={{
-                                duration: 3,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                            }}
-                        />
-
-                        <motion.div
-                            className="absolute inset-2 bg-gradient-to-br from-primary to-secondary rounded-3xl opacity-80"
-                            animate={{
-                                skewX: [0, 2, -2, 0],
-                                skewY: [0, -2, 2, 0],
-                            }}
-                            transition={{
-                                duration: 4,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                            }}
-                        />
-
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <motion.div
-                                animate={{
-                                    scale: [1, 1.05, 1],
-                                    rotate: [0, 360],
-                                }}
-                                transition={{
-                                    scale: { duration: 3, repeat: Infinity },
-                                    rotate: { duration: 8, repeat: Infinity, ease: "linear" },
-                                }}
-                                className="text-white"
-                            >
-                                <Zap size={64} />
-                            </motion.div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div
-                        className="absolute w-96 h-96 border-2 border-primary/20 rounded-full pointer-events-none"
-                        animate={{ rotate: [0, 360] }}
-                        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    >
-                        {[0, 90, 180, 270].map((angle, idx) => (
-                            <motion.div
-                                key={angle}
-                                className="absolute w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center text-white shadow-lg cursor-pointer"
-                                style={{
-                                    top: "50%",
-                                    left: "50%",
-                                    transform: `rotate(${angle}deg) translateY(-192px) rotate(-${angle}deg)`,
-                                }}
-                                animate={{
-                                    scale: [1, 1.2, 1],
-                                }}
-                                transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    delay: idx * 0.2,
-                                }}
-                            >
-                                <Globe size={24} />
-                            </motion.div>
-                        ))}
-                    </motion.div>
-
-                    <motion.div
-                        className="absolute w-80 h-80 border border-secondary/30 rounded-full pointer-events-auto"
-                        animate={{ rotate: [360, 0] }}
-                        transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-                    >
-                        {features.map((feature, i) => {
-                            const angle = (i / features.length) * 360;
-                            const Icon = feature.icon;
-                            return (
-                                <motion.div
-                                    key={i}
-                                    className="absolute"
-                                    style={{
-                                        top: "50%",
-                                        left: "50%",
-                                        transform: `rotate(${angle}deg) translateY(-160px) rotate(-${angle}deg)`,
-                                    }}
-                                >
-                                    <motion.div
-                                        className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center text-white shadow-xl cursor-pointer select-none`}
-                                        whileHover={{ scale: 1.3 }}
-                                        onMouseEnter={() => setActiveCard(i)}
-                                        onMouseLeave={() => setActiveCard(null)}
-                                        animate={
-                                            activeCard === i
-                                                ? { scale: 1.3, zIndex: 50 }
-                                                : { scale: 1, zIndex: 10 }
-                                        }
-                                    >
-                                        <Icon size={28} />
-                                    </motion.div>
-                                    {activeCard === i && (
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            className="absolute top-full mt-3 -left-6 whitespace-nowrap bg-slate-900 dark:bg-slate-950 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-lg"
-                                        >
-                                            {feature.label}
-                                        </motion.div>
-                                    )}
-                                </motion.div>
-                            );
-                        })}
-                    </motion.div>
-                </div>
-
-                <motion.div
-                    className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2"
-                    animate={{
-                        y: [0, -10, 0],
-                    }}
-                    transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
+                    className="absolute top-6 right-6 px-3 py-1.5 rounded-full bg-background/95 border border-primary/20 shadow-md text-xs font-semibold flex items-center gap-2"
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ duration: 2.8, repeat: Infinity }}
                 >
-                    {[0, 1, 2].map((i) => (
-                        <motion.div
-                            key={i}
-                            className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary"
-                            animate={{ opacity: [0.3, 1, 0.3] }}
-                            transition={{
-                                duration: 1.5,
-                                repeat: Infinity,
-                                delay: i * 0.2,
-                            }}
-                        />
-                    ))}
+                    <TrendingUp className="h-3.5 w-3.5 text-primary" />
+                    Career Ready
                 </motion.div>
 
                 <motion.div
-                    className="absolute top-10 right-10 w-32 h-32 border-2 border-primary/20 rounded-2xl flex items-center justify-center"
-                    animate={{
-                        rotate: [0, 360],
-                        scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                        rotate: { duration: 15, repeat: Infinity, ease: "linear" },
-                        scale: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-                    }}
+                    className="absolute bottom-8 left-6 px-3 py-1.5 rounded-full bg-background/95 border border-secondary/20 shadow-md text-xs font-semibold flex items-center gap-2"
+                    animate={{ y: [0, 4, 0] }}
+                    transition={{ duration: 3.1, repeat: Infinity }}
                 >
-                    <motion.div
-                        animate={{
-                            rotate: [360, 0],
-                        }}
-                        transition={{
-                            duration: 10,
-                            repeat: Infinity,
-                            ease: "linear",
-                        }}
-                        className="text-primary"
-                    >
-                        <Code size={48} />
-                    </motion.div>
+                    <Users className="h-3.5 w-3.5 text-secondary" />
+                    Trusted by learners
                 </motion.div>
-
-                <motion.div
-                    className="absolute bottom-10 left-10 w-28 h-28 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full pointer-events-none"
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.6, 0.3],
-                    }}
-                    transition={{
-                        duration: 4,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                />
-
-                <motion.div
-                    className="absolute top-1/4 -left-20 w-40 h-40 border-2 border-dashed border-secondary/20 rounded-full pointer-events-none"
-                    animate={{
-                        rotate: [0, 360],
-                    }}
-                    transition={{
-                        duration: 45,
-                        repeat: Infinity,
-                        ease: "linear",
-                    }}
-                />
-
-                <motion.div
-                    className="absolute bottom-1/4 -right-10 w-32 h-32 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 pointer-events-none"
-                    animate={{
-                        y: [0, 30, 0],
-                    }}
-                    transition={{
-                        duration: 5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                />
             </motion.div>
-        </div>
+        </motion.div>
     );
 }
 
@@ -336,26 +118,26 @@ export default function HomePage() {
         <div className="flex flex-col bg-background">
             <section className="relative py-24 lg:py-40 overflow-hidden min-h-[90vh] flex items-center">
                 <div className="absolute inset-0 gradient-hero" />
-                
-                <motion.div 
+
+                <motion.div
                     className="absolute top-32 right-1/4 w-80 h-80 bg-primary/15 rounded-full blur-3xl"
-                    animate={{ 
+                    animate={{
                         scale: [1, 1.15, 1],
                         opacity: [0.4, 0.6, 0.4]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 8,
                         repeat: Infinity,
                         ease: "easeInOut"
                     }}
                 />
-                <motion.div 
+                <motion.div
                     className="absolute -bottom-32 -left-32 w-96 h-96 bg-secondary/15 rounded-full blur-3xl"
-                    animate={{ 
+                    animate={{
                         scale: [1, 1.25, 1],
                         opacity: [0.3, 0.5, 0.3]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 10,
                         repeat: Infinity,
                         ease: "easeInOut",
@@ -377,7 +159,7 @@ export default function HomePage() {
                                 </div>
                             </motion.div>
 
-                            <motion.h1 
+                            <motion.h1
                                 className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight"
                                 variants={fadeInUp}
                             >
@@ -385,15 +167,15 @@ export default function HomePage() {
                                 <span className="gradient-text block mt-2">Opportunities</span>
                             </motion.h1>
 
-                            <motion.p 
+                            <motion.p
                                 className="text-lg text-muted-foreground mb-8 max-w-xl leading-relaxed"
                                 variants={fadeInUp}
                             >
-                                Connect with industry leaders, master in-demand skills, and secure your next role. 
+                                Connect with industry leaders, master in-demand skills, and secure your next role.
                                 All in one platform built for ambitious professionals.
                             </motion.p>
 
-                            <motion.div 
+                            <motion.div
                                 className="flex flex-col sm:flex-row gap-4 mb-12"
                                 variants={fadeInUp}
                             >
@@ -412,7 +194,7 @@ export default function HomePage() {
                                 </motion.div>
                             </motion.div>
 
-                            <motion.div 
+                            <motion.div
                                 className="flex items-center gap-8"
                                 variants={fadeInUp}
                             >
@@ -436,7 +218,7 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <motion.section 
+            <motion.section
                 className="py-16 border-y bg-gradient-to-r from-primary/5 via-transparent to-secondary/5"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -450,8 +232,8 @@ export default function HomePage() {
                             { value: "50K+", label: "Members" },
                             { value: "100+", label: "Programs" }
                         ].map((stat, index) => (
-                            <motion.div 
-                                key={index} 
+                            <motion.div
+                                key={index}
                                 className="text-center"
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
@@ -468,7 +250,7 @@ export default function HomePage() {
 
             <section className="py-24">
                 <div className="container mx-auto px-4">
-                    <motion.div 
+                    <motion.div
                         className="text-center mb-16"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -480,7 +262,7 @@ export default function HomePage() {
                         </p>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                         className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
                         variants={staggerContainer}
                         initial="initial"
@@ -522,7 +304,7 @@ export default function HomePage() {
                             <motion.div key={index} variants={fadeInUp}>
                                 <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-muted/30 h-full hover:border-primary/20 border">
                                     <CardContent className="p-8">
-                                        <motion.div 
+                                        <motion.div
                                             className="w-14 h-14 bg-primary/15 rounded-xl flex items-center justify-center mb-4"
                                             whileHover={{ scale: 1.1, rotate: 5 }}
                                             transition={{ duration: 0.3 }}
@@ -543,7 +325,7 @@ export default function HomePage() {
 
             <section className="py-24 bg-muted/30">
                 <div className="container mx-auto px-4">
-                    <motion.div 
+                    <motion.div
                         className="text-center mb-16"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -555,7 +337,7 @@ export default function HomePage() {
                         </p>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                         className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto"
                         variants={staggerContainer}
                         initial="initial"
@@ -587,7 +369,7 @@ export default function HomePage() {
                                         {step.description}
                                     </p>
                                     {index < 2 && (
-                                        <motion.div 
+                                        <motion.div
                                             className="hidden md:block absolute top-20 -right-4 text-primary/20"
                                             animate={{ x: [0, 8, 0] }}
                                             transition={{ duration: 2, repeat: Infinity }}
@@ -604,7 +386,7 @@ export default function HomePage() {
 
             <section className="py-24">
                 <div className="container mx-auto px-4">
-                    <motion.div 
+                    <motion.div
                         className="text-center mb-16"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -614,7 +396,7 @@ export default function HomePage() {
                         <p className="text-muted-foreground text-lg">Discover opportunities in high-demand sectors</p>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                         className="grid grid-cols-2 md:grid-cols-4 gap-4"
                         variants={staggerContainer}
                         initial="initial"
@@ -650,7 +432,7 @@ export default function HomePage() {
 
             <section className="py-24">
                 <div className="container mx-auto px-4">
-                    <motion.div 
+                    <motion.div
                         className="text-center mb-16"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -660,7 +442,7 @@ export default function HomePage() {
                         <p className="text-muted-foreground text-lg">Whether you're growing your career or building a team</p>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                         className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto"
                         variants={staggerContainer}
                         initial="initial"
@@ -670,7 +452,7 @@ export default function HomePage() {
                         <motion.div variants={fadeInUp}>
                             <Card className="shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden h-full border-0 bg-gradient-to-br from-blue-50 to-blue-50/50 dark:from-blue-950/30 dark:to-blue-950/20">
                                 <CardContent className="p-8">
-                                    <motion.div 
+                                    <motion.div
                                         className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-6"
                                         whileHover={{ scale: 1.1, rotate: 5 }}
                                     >
@@ -684,7 +466,7 @@ export default function HomePage() {
                                             "Resume and interview prep",
                                             "Direct company connections"
                                         ].map((item, i) => (
-                                            <motion.li 
+                                            <motion.li
                                                 key={i}
                                                 className="flex items-start gap-3"
                                                 initial={{ opacity: 0, x: -20 }}
@@ -712,7 +494,7 @@ export default function HomePage() {
                         <motion.div variants={fadeInUp}>
                             <Card className="shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden h-full border-0 bg-gradient-to-br from-purple-50 to-purple-50/50 dark:from-purple-950/30 dark:to-purple-950/20">
                                 <CardContent className="p-8">
-                                    <motion.div 
+                                    <motion.div
                                         className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-6"
                                         whileHover={{ scale: 1.1, rotate: -5 }}
                                     >
@@ -726,7 +508,7 @@ export default function HomePage() {
                                             "Post unlimited positions",
                                             "Analytics and insights"
                                         ].map((item, i) => (
-                                            <motion.li 
+                                            <motion.li
                                                 key={i}
                                                 className="flex items-start gap-3"
                                                 initial={{ opacity: 0, x: -20 }}
@@ -754,41 +536,41 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <motion.section 
+            <motion.section
                 className="py-32 gradient-primary text-primary-foreground relative overflow-hidden"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
             >
-                <motion.div 
+                <motion.div
                     className="absolute top-1/4 right-1/3 w-72 h-72 bg-white/10 rounded-full blur-3xl"
-                    animate={{ 
+                    animate={{
                         scale: [1, 1.2, 1],
                         x: [0, 40, 0],
                         y: [0, 30, 0]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 10,
                         repeat: Infinity,
                         ease: "easeInOut"
                     }}
                 />
-                <motion.div 
+                <motion.div
                     className="absolute -bottom-20 -left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"
-                    animate={{ 
+                    animate={{
                         scale: [1, 1.25, 1],
                         x: [0, -30, 0],
                         y: [0, -50, 0]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 12,
                         repeat: Infinity,
                         ease: "easeInOut",
                         delay: 1
                     }}
                 />
-                
+
                 <div className="container mx-auto px-4 text-center relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -799,7 +581,7 @@ export default function HomePage() {
                         <Sparkles className="h-12 w-12 mx-auto mb-6 animate-pulse" />
                         <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Grow?</h2>
                         <p className="text-lg opacity-95 mb-10 max-w-2xl mx-auto leading-relaxed">
-                            Join thousands building their future on our platform. 
+                            Join thousands building their future on our platform.
                             Start your journey today and unlock unlimited potential.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
